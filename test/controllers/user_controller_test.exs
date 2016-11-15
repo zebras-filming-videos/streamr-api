@@ -24,5 +24,19 @@ defmodule Streamr.UserControllerTest do
         "title" => "can't be blank",
         "source" => %{"pointer" => "/data/attributes/email"}}]
     end
+
+    test "when a user exists with the email", %{conn: conn} do
+      conn = post conn, "api/v1/users/new", %{"user" => @valid_user_attrs}
+      json_response(conn, 201)
+
+      conn = build_conn()
+      conn = post conn, "api/v1/users/new", %{"user" => @valid_user_attrs}
+
+      body = json_response(conn, 422)["errors"]
+      assert body == [%{
+        "detail" => "Email is invalid",
+        "title" => "is invalid",
+        "source" => %{"pointer" => "/data/attributes/email"}}]
+    end
   end
 end

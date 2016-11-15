@@ -14,7 +14,7 @@ defmodule Streamr.User do
     model
     |> cast(params, ~w(name email), [])
     |> validate_length(:email, min: 1, max: 20)
-    |> unique_constraint(:email)
+    |> validate_email_uniqueness
   end
 
   def registration_changeset(model, params) do
@@ -31,6 +31,18 @@ defmodule Streamr.User do
         put_change(changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(pass))
       _ ->
         changeset
+    end
+  end
+
+  defp validate_email_uniqueness(changeset) do
+    validate_change changeset, :email, fn _field, email ->
+      user = Streamr.Repo.get_by(Streamr.User, email: email || "")
+
+      if is_nil(user) do
+        []
+      else
+        [{:email, "is invalid"}]
+      end
     end
   end
 end
