@@ -12,9 +12,9 @@ defmodule Streamr.User do
 
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(name username), [])
-    |> validate_length(:username, min: 1, max: 20)
-    |> unique_constraint(:username)
+    |> cast(params, ~w(name email), [])
+    |> validate_length(:email, min: 1, max: 20)
+    |> unique_constraint(:email)
   end
 
   def registration_changeset(model, params) do

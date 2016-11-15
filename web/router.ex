@@ -13,7 +13,7 @@ defmodule Streamr.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", Streamr do
+  scope "/api/v1", Streamr do
     pipe_through :api
 
     post "/users/new", UserController, :create
