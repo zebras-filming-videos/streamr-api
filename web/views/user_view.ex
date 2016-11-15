@@ -1,7 +1,6 @@
 defmodule Streamr.UserView do
   use Streamr.Web, :view
+  use JaSerializer.PhoenixView
 
-  def render("show.json", %{user: user}) do
-    JaSerializer.format(Streamr.UserSerializer, user)
-  end
+  attributes [:name, :username]
 end

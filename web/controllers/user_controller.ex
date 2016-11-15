@@ -9,7 +9,12 @@ defmodule Streamr.UserController do
       {:ok, user} ->
         conn
         |> put_status(201)
-        |> render("show.json", user: user)
+        |> render("show.json-api", data: user)
+
+      {:error, changeset} ->
+        conn
+        |> put_status(422)
+        |> render("errors.json-api", data: changeset)
     end
   end
 end

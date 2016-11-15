@@ -14,9 +14,8 @@ defmodule Streamr.Router do
   end
 
   scope "/", Streamr do
-    pipe_through :browser # Use the default browser stack
+    pipe_through :api
 
-    get "/", PageController, :index
     post "/users/new", UserController, :create
   end
 end
