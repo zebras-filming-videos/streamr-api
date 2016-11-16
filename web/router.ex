@@ -11,6 +11,8 @@ defmodule Streamr.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.LoadResource
   end
 
   scope "/api/v1", Streamr do

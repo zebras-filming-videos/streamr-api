@@ -32,3 +32,9 @@ config :phoenix, :format_encoders,
 config :mime, :types, %{
   "application/vnd.api+json" => ["json-api"]
 }
+
+config :guardian, Guardian,
+  issuer: "MyApp",
+  ttl: { 1, :hours },
+  secret_key: Streamr.Endpoint.config(:secret_key_base),
+  serializer: Streamr.GuardianSerializer
