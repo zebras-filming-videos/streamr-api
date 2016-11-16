@@ -2,7 +2,6 @@ defmodule Streamr.Factory do
   # with Ecto
   use ExMachina.Ecto, repo: Streamr.Repo
 
-
   def user_factory do
     %Streamr.User{
       name: sequence(:username, &"User-#{&1}"),
