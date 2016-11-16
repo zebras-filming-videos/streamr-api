@@ -35,7 +35,7 @@ defmodule Streamr.UserControllerTest do
       json_response(conn, 201)
 
       conn = build_conn()
-      conn = post conn, user_path(conn, :create, %{"user" => valid_user})
+      conn = post conn, "api/v1/users/new", %{"user" => valid_user}
 
       body = json_response(conn, 422)["errors"]
       assert body == [%{
