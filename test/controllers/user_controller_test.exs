@@ -7,7 +7,7 @@ defmodule Streamr.UserControllerTest do
     test "with valid user data", %{conn: conn} do
       valid_user = params_for(:user)
 
-      conn = post conn, user_path(conn, :create, %{"user" => valid_user})
+      conn = post conn, "api/v1/users/new", %{"user" => valid_user}
       body = json_response(conn, 201)
 
       assert body["data"]["id"]
@@ -20,7 +20,7 @@ defmodule Streamr.UserControllerTest do
     test "with invalid data", %{conn: conn} do
       invalid_user = params_for(:user, email: nil)
 
-      conn = post conn, user_path(conn, :create, %{"user" => invalid_user})
+      conn = post conn, "api/v1/users/new", %{"user" => invalid_user}
       body = json_response(conn, 422)["errors"]
       assert body == [%{
         "detail" => "Email can't be blank",
@@ -31,7 +31,7 @@ defmodule Streamr.UserControllerTest do
     test "when a user exists with the email", %{conn: conn} do
       valid_user = params_for(:user)
 
-      conn = post conn, user_path(conn, :create, %{"user" => valid_user})
+      conn = post conn, "api/v1/users/new", %{"user" => valid_user}
       json_response(conn, 201)
 
       conn = build_conn()
