@@ -1,7 +1,6 @@
 defmodule Streamr.UserTest do
   use Streamr.ConnCase
   alias Streamr.User
-  alias Streamr.Repo
 
   import Streamr.Factory
 

@@ -1,5 +1,7 @@
 defmodule Streamr.UserControllerTest do
   use Streamr.ConnCase
+  alias Streamr.User
+  alias Streamr.Repo
 
   import Streamr.Factory
 
@@ -43,5 +45,66 @@ defmodule Streamr.UserControllerTest do
         "title" => "is invalid",
         "source" => %{"pointer" => "/data/attributes/email"}}]
     end
+  end
+
+  describe "POST /users/auth (password grant type)" do
+    setup do
+      changeset = User.registration_changeset(
+        %User{},
+        %{name: "Foo", email: "foo@bar.com", password: "password"}
+      )
+
+      {:ok, user} = Repo.insert(changeset)
+      {:ok, [user: user]}
+    end
+
+    test "with valid credentials" do
+      conn = post(
+        build_conn(),
+        "api/v1/users/auth",
+        %{email: "foo@bar.com", password: "password", grant_type: "password"}
+      )
+
+      body = json_response(conn, 200)
+
+      assert body["access_token"]
+      assert body["expires_in"] == 3600
+      assert body["token_type"] == "bearer"
+      assert body["refresh_token"]
+    end
+
+    test "with invalid credentials" do
+      conn = post(
+        build_conn(),
+        "api/v1/users/auth",
+        %{email: "foo@bar.com", password: "INVALID PASSWORD", grant_type: "password"}
+      )
+
+      body = json_response(conn, 401)["errors"]
+
+      assert body == [%{
+          "detail" => "Invalid username/password combination",
+          "title" => "invalid login",
+          "status" => 401
+        }]
+    end
+  end
+
+  describe "POST /users/auth (refresh_token grant type)" do
+    # # test "with invalid credentials" do
+    #   conn = post(
+    #     build_conn(),
+    #     "api/v1/users/auth",
+    #     %{email: "foo@bar.com", password: "INVALID PASSWORD", grant_type: "password"}
+    #   )
+    #
+    #   body = json_response(conn, 401)["errors"]
+    #
+    #   assert body == [%{
+    #       "detail" => "Invalid refresh token",
+    #       "title" => "invalid token",
+    #       "status" => 401
+    #     }]
+    # end
   end
 end
