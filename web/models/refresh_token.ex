@@ -1,13 +1,12 @@
 defmodule Streamr.RefreshToken do
   use Streamr.Web, :model
 
-  alias Streamr.{RefreshToken, Repo, User}
+  alias Streamr.{RefreshToken, Repo}
   import Ecto.Query
 
   schema "refresh_tokens" do
     field :token, :string, null: false
-
-    belongs_to :user, User
+    belongs_to :user, Streamr.User
 
     timestamps
   end
@@ -25,6 +24,12 @@ defmodule Streamr.RefreshToken do
   def tokens_for_user(user) do
     from token in RefreshToken,
     where: token.user_id == ^user.id
+  end
+
+  def find_associated_user(token) do
+    if refresh_token = Repo.get_by(RefreshToken, token: token) do
+      Repo.preload(refresh_token, :user).user
+    end
   end
 
   defp new_token_changeset(user) do
