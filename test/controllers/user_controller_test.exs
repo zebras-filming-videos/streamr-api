@@ -47,7 +47,11 @@ defmodule Streamr.UserControllerTest do
 
   describe "POST /users/auth (password grant type)" do
     setup do
-      user = build(:user, password: "password") |> set_password("password") |> insert
+      user = :user
+             |> build(password: "password")
+             |> set_password("password")
+             |> insert
+
       {:ok, [user: user]}
     end
 

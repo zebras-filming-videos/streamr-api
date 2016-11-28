@@ -6,7 +6,11 @@ defmodule Streamr.UserTest do
 
   describe ".find_and_confirm_password" do
     test "returns the user, if credentials are valid" do
-      user = build(:user, password: nil) |> set_password("password") |> insert
+      user = :user
+             |> build(password: nil)
+             |> set_password("password")
+             |> insert
+
       assert {:ok, user} == User.find_and_confirm_password(user.email, "password")
     end
 

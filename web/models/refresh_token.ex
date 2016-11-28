@@ -27,7 +27,9 @@ defmodule Streamr.RefreshToken do
   end
 
   def find_associated_user(token) do
-    if refresh_token = Repo.get_by(RefreshToken, token: token) do
+    refresh_token = Repo.get_by(RefreshToken, token: token)
+
+    if refresh_token do
       Repo.preload(refresh_token, :user).user
     end
   end

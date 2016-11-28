@@ -1,6 +1,7 @@
 defmodule Streamr.SecureRandom do
   def base64(length) do
-    random_bytes(length)
+    length
+    |> random_bytes
     |> :base64.encode_to_string
     |> to_string
   end
