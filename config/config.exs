@@ -34,7 +34,7 @@ config :mime, :types, %{
 }
 
 config :guardian, Guardian,
-  issuer: "MyApp",
+  issuer: "Streamr",
   ttl: { 1, :hours },
   secret_key: %{"k" => "X5uaThfmNGtgdwaYJJjUFA", "kty" => "oct"},
   serializer: Streamr.GuardianSerializer
