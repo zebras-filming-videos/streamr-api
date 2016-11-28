@@ -41,7 +41,8 @@ defmodule Streamr.Mixfile do
      {:comeonin, "~> 2.0"},
      {:ja_serializer, "~> 0.11.1"},
      {:guardian, "~> 0.13.0"},
-     {:ex_machina, "~> 1.0", only: :test}]
+     {:ex_machina, "~> 1.0", only: :test},
+     {:dogma, "~> 0.1", only: :dev}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
