@@ -1,6 +1,5 @@
 defmodule Streamr.UserControllerTest do
   use Streamr.ConnCase
-  alias Streamr.{User, Repo}
 
   import Streamr.Factory
 
@@ -48,20 +47,15 @@ defmodule Streamr.UserControllerTest do
 
   describe "POST /users/auth (password grant type)" do
     setup do
-      changeset = User.registration_changeset(
-        %User{},
-        %{name: "Foo", email: "foo@bar.com", password: "password"}
-      )
-
-      {:ok, user} = Repo.insert(changeset)
+      user = build(:user, password: "password") |> set_password("password") |> insert
       {:ok, [user: user]}
     end
 
-    test "with valid credentials" do
+    test "with valid credentials", context do
       conn = post(
         build_conn(),
         "api/v1/users/auth",
-        %{email: "foo@bar.com", password: "password", grant_type: "password"}
+        %{email: context[:user].email, password: context[:user].password, grant_type: "password"}
       )
 
       body = json_response(conn, 200)
