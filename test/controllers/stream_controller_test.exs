@@ -5,18 +5,14 @@ defmodule Streamr.StreamControllerTest do
 
   describe "GET /api/v1/streams" do
     setup do
-      user = insert(:user)
       insert_list(2, :stream)
 
-      conn = build_conn()
-             |> Guardian.Plug.api_sign_in(user)
-
-      {:ok, [conn: conn]}
+      :ok
     end
 
-    test "it returns all streams", %{conn: conn} do
+    test "it returns all streams" do
       conn = get(
-        conn,
+        build_conn(),
         "/api/v1/streams"
       )
 
