@@ -19,7 +19,7 @@ defmodule Streamr.Mixfile do
   def application do
     [mod: {Streamr, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :comeonin, :ja_serializer, :guardian]]
+                    :phoenix_ecto, :postgrex, :comeonin, :ja_serializer, :guardian, :swoosh]]
   end
 
   # Specifies which paths to compile per environment.
@@ -43,7 +43,9 @@ defmodule Streamr.Mixfile do
      {:guardian, "~> 0.13.0"},
      {:ex_machina, "~> 1.0", only: :test},
      {:cors_plug, "~> 1.1"},
-     {:dogma, "~> 0.1", only: :dev}]
+     {:dogma, "~> 0.1", only: :dev},
+     {:swoosh,  "~> 0.5.0"},
+     {:gen_smtp, "~> 0.11.0"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
