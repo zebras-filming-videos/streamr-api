@@ -20,5 +20,7 @@ defmodule Streamr.Router do
 
     resources "/users", UserController, only: [:create]
     post "/users/auth", UserController, :auth
+
+    resources "/streams", StreamController, only: [:index]
   end
 end
