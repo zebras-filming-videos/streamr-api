@@ -22,7 +22,7 @@ defmodule Streamr.UserControllerTest do
       valid_user = params_for(:user)
 
       post conn, "api/v1/users", %{"user" => valid_user}
-      assert_email_sent Streamr.Email.welcome_email(valid_user)
+      assert_email_sent Streamr.Email.welcome(valid_user)
     end
 
     test "with invalid data", %{conn: conn} do
