@@ -19,7 +19,8 @@ defmodule Streamr.Mixfile do
   def application do
     [mod: {Streamr, []},
      applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :comeonin, :ja_serializer, :guardian, :swoosh]]
+                    :phoenix_ecto, :postgrex, :comeonin, :ja_serializer, :guardian,
+                    :phoenix_swoosh, :swoosh]]
   end
 
   # Specifies which paths to compile per environment.
@@ -45,6 +46,7 @@ defmodule Streamr.Mixfile do
      {:cors_plug, "~> 1.1"},
      {:dogma, "~> 0.1", only: :dev},
      {:swoosh,  "~> 0.5.0"},
+     {:phoenix_swoosh,  "~> 0.1.3"},
      {:gen_smtp, "~> 0.11.0"}]
   end
 

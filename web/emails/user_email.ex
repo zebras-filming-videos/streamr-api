@@ -1,13 +1,13 @@
 defmodule Streamr.Email do
-  import Swoosh.Email
+  use Phoenix.Swoosh, view: Streamr.Email.UserView, layout: {Streamr.LayoutView, :email}
   # When we want to do HTML
   # use view: Streamr.EmailView
 
-  def welcome_email(user) do
+  def welcome(user) do
     new
     |> to({user.name, user.email})
     |> from({"Team Streamr", "team@streamr.live"})
     |> subject("Welcome to Streamr")
-    |> text_body("Just verify with us.")
+    |> render_body("welcome.html" , %{name: user.name})
   end
 end

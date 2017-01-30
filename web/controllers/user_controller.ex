@@ -68,7 +68,7 @@ defmodule Streamr.UserController do
 
   defp send_welcome_email(user) do
     user
-    |> Email.welcome_email
+    |> Email.welcome
     |> Mailer.deliver
   end
 end
