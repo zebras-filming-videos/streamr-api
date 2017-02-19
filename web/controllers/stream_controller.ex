@@ -14,14 +14,6 @@ defmodule Streamr.StreamController do
     render(conn, "index.json-api", data: streams)
   end
 
-  defp filtered_streams(user_id) do
-    if user_id do
-      Stream.for_user(user_id)
-    else
-      Stream
-    end
-  end
-
   def create(conn, %{"stream" => stream_params}) do
     changeset = conn
                 |> Guardian.Plug.current_resource
@@ -35,6 +27,7 @@ defmodule Streamr.StreamController do
         conn
         |> put_status(201)
         |> render("show.json-api", data: Repo.preload(stream, :user))
+
       {:error, changeset} ->
         conn
         |> put_status(422)
@@ -63,5 +56,13 @@ defmodule Streamr.StreamController do
 
   defp get_stream(params) do
     Repo.get(Stream, Map.get(params, "stream_id"))
+  end
+
+  defp filtered_streams(user_id) do
+    if user_id do
+      Stream.for_user(user_id)
+    else
+      Stream
+    end
   end
 end
