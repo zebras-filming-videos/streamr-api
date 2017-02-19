@@ -30,7 +30,7 @@ defmodule Streamr.Mixfile do
          :comeonin,
          :ja_serializer,
          :guardian,
-         :phoenix_swoosh, 
+         :phoenix_swoosh,
          :swoosh,
          :scrivener_ecto,
          :scrivener
