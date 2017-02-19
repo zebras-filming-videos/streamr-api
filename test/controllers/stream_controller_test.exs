@@ -53,7 +53,7 @@ defmodule Streamr.StreamControllerTest do
   describe "POST /api/v1/streams/:id" do
     test "it adds a new line to the stream's stream_data" do
       user = insert(:user)
-      stream = insert(:stream) |> with_stream_data
+      stream = :stream |> insert |> with_stream_data
       line_data = build(:line_data)
 
       conn = post_authorized(user, "/api/v1/streams/#{stream.id}/add_line", %{line: line_data})
