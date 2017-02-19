@@ -45,9 +45,12 @@ defmodule Streamr.Factory do
 
   def line_data_factory do
     %{
-      "x" => 0.5,
-      "y" => 0.5,
-      "time" => 1000
+      "points" => [%{
+        "x" => 0.5,
+        "y" => 0.5,
+        "time" => 1000
+      }],
+      "color_id" => 1
     }
   end
 
