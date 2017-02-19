@@ -31,6 +31,26 @@ defmodule Streamr.Factory do
     }
   end
 
+  def with_stream_data(stream) do
+    insert(:stream_data, stream: stream)
+    stream
+  end
+
+  def stream_data_factory do
+    %Streamr.StreamData{
+      stream: build(:stream),
+      lines: []
+    }
+  end
+
+  def line_data_factory do
+    %{
+      "x" => 0.5,
+      "y" => 0.5,
+      "time" => 1000
+    }
+  end
+
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | password_hash: hashed_password}

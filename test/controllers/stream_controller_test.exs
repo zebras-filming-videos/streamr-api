@@ -3,6 +3,8 @@ defmodule Streamr.StreamControllerTest do
 
   import Streamr.Factory
 
+  alias Streamr.{Repo, Stream, StreamData}
+
   describe "GET /api/v1/streams" do
     setup do
       insert_list(2, :stream)
@@ -34,6 +36,31 @@ defmodule Streamr.StreamControllerTest do
       assert body["data"]["attributes"]["title"] == valid_stream.title
       assert body["data"]["attributes"]["description"] == valid_stream.description
       assert body["data"]["relationships"]["user"]["data"]["id"] == Integer.to_string(user.id)
+    end
+
+    test "it initializes an empty data for the stream" do
+      user = insert(:user)
+      valid_stream = params_for(:stream)
+
+      conn = post_authorized(user, "/api/v1/streams", %{stream: valid_stream})
+      body = json_response(conn, 201)
+
+      stream = Repo.get(Stream, body["data"]["id"])
+      assert StreamData.for_stream(stream).lines == []
+    end
+  end
+
+  describe "POST /api/v1/streams/:id" do
+    test "it adds a new line to the stream's stream_data" do
+      user = insert(:user)
+      stream = insert(:stream) |> with_stream_data
+      line_data = build(:line_data)
+
+      conn = post_authorized(user, "/api/v1/streams/#{stream.id}/add_line", %{line: line_data})
+      assert response(conn, 201)
+
+      data = StreamData.for_stream(stream)
+      assert data.lines == [line_data]
     end
   end
 end

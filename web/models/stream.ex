@@ -3,10 +3,12 @@ defmodule Streamr.Stream do
   import Ecto.Query
 
   schema "streams" do
-    belongs_to :user, Streamr.User
     field :title, :string, null: false
     field :description, :string
     field :image, :string
+
+    belongs_to :user, Streamr.User
+    has_one :stream_data, Streamr.StreamData
 
     timestamps
   end
