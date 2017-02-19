@@ -40,7 +40,6 @@ defmodule Streamr.StreamController do
       {:ok, _} ->
         send_resp(conn, 201, "")
       {:error, err} ->
-        IO.puts err
         send_resp(conn, 422, "")
     end
   end
