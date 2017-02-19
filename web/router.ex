@@ -23,7 +23,7 @@ defmodule Streamr.Router do
     get "/users/email_available", UserController, :email_available
     get "/users/me", UserController, :me
 
-    resources "/streams", StreamController, only: [:index]
+    resources "/streams", StreamController, only: [:index, :create]
 
     resources "/topics", TopicController, only: [:index]
   end

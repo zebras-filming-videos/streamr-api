@@ -21,4 +21,19 @@ defmodule Streamr.StreamControllerTest do
       assert 2 == Enum.count(response)
     end
   end
+
+  describe "POST /api/v1/streams" do
+    test "it creates a new stream" do
+      user = insert(:user)
+      valid_stream = params_for(:stream)
+
+      conn = post_authorized(user, "/api/v1/streams", %{stream: valid_stream})
+      body = json_response(conn, 201)
+
+      assert body["data"]["id"]
+      assert body["data"]["attributes"]["title"] == valid_stream.title
+      assert body["data"]["attributes"]["description"] == valid_stream.description
+      assert body["data"]["relationships"]["user"]["data"]["id"] == Integer.to_string(user.id)
+    end
+  end
 end
