@@ -1,6 +1,7 @@
 defmodule Streamr.StreamControllerTest do
   use Streamr.ConnCase
 
+  import Slugger
   import Streamr.Factory
 
   alias Streamr.{Repo, Stream, StreamData}
@@ -21,6 +22,19 @@ defmodule Streamr.StreamControllerTest do
       response = json_response(conn, 200)["data"]
 
       assert 2 == Enum.count(response)
+    end
+  end
+
+  describe "GET /api/v1/streams/:slug" do
+    test "it returns stream with id 2" do
+      stream = insert(:stream)
+
+      conn = get(
+        build_conn(),
+        "/api/v1/streams/#{Slugger.slugify('#{stream.id} #{stream.title}')}"
+      )
+
+      response = json_response(conn, 200)["data"]
     end
   end
 
