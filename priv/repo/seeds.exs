@@ -86,26 +86,38 @@ Repo.insert! %Stream{
   user_id: 1
 }
 
+# Blue
 Repo.insert! %Color{
-  normal: "#61afef"
+  normal: "#61afef"m
+  order: 5
 }
 
+# Red
 Repo.insert! %Color{
-  normal: "#e06c75"
+  normal: "#e06c75",
+  order: 2
 }
 
+# Green
 Repo.insert! %Color{
-  normal: "#98c379"
+  normal: "#98c379",
+  order: 4
 }
 
+# Purps
 Repo.insert! %Color{
-  normal: "#c678dd"
+  normal: "#c678dd",
+  order: 6
 }
 
+# Orange
 Repo.insert! %Color{
-  normal: "#d19a66"
+  normal: "#d19a66",
+  order: 3
 }
 
+# White
 Repo.insert! %Color{
-  normal: "#abb2bf"
+  normal: "#abb2bf",
+  order: 1
 }
