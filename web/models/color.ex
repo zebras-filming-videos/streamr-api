@@ -6,7 +6,13 @@ defmodule Streamr.Color do
     field :deuteranopia, :string
     field :protanopia, :string
     field :tritanopia, :string
+    field :order, :integer
 
     timestamps
+  end
+
+  def ordered(query) do
+    from color in query,
+    order_by: [asc: color.order]
   end
 end

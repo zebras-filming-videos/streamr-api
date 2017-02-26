@@ -7,6 +7,7 @@ defmodule Streamr.Repo.Migrations.CreateColors do
       add :deuteranopia, :string
       add :protanopia, :string
       add :tritanopia, :string
+      add :order, :integer
 
       timestamps
     end
