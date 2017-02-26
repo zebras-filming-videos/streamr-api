@@ -28,7 +28,7 @@ defmodule Streamr.StreamControllerTest do
   describe "GET /api/v1/streams/:slug" do
     test "it returns stream with id 2" do
       stream  = insert(:stream)
-      slug    = Slugger.slugify('#{stream.id} #{stream.title}')
+      slug = Slugger.slugify('#{stream.id} #{stream.title}')
 
       conn = get(
         build_conn(),
