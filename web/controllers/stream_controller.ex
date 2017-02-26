@@ -39,7 +39,7 @@ defmodule Streamr.StreamController do
     case StreamData.append_to(stream, params["line"]) do
       {:ok, _} ->
         send_resp(conn, 201, "")
-      {:error, err} ->
+      {:error, _} ->
         send_resp(conn, 422, "")
     end
   end
