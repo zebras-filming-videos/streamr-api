@@ -45,6 +45,6 @@ defmodule Streamr.StreamUploader do
   end
 
   defp io_query(conn, stream) do
-    Postgrex.prepare!(conn, "", "COPY (#{stream_data_query(stream)}) TO STDOUT")
+    Postgrex.prepare!(conn, "", "copy (#{stream_data_query(stream)}) to stdout")
   end
 end
