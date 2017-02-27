@@ -45,13 +45,17 @@ defmodule Streamr.StreamController do
 
   def add_line(conn, params) do
     stream = get_stream(params)
-
     case StreamData.append_to(stream, params["line"]) do
       {:ok, _} ->
         send_resp(conn, 201, "")
       {:error, _} ->
         send_resp(conn, 422, "")
     end
+  end
+
+  def end_stream(conn, params) do
+    stream = params |> get_stream |> Repo.preload(:stream_data)
+    StreamUploader.process(stream)
   end
 
   defp get_stream(params) do
