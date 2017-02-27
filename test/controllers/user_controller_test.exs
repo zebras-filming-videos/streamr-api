@@ -68,6 +68,22 @@ defmodule Streamr.UserControllerTest do
     end
   end
 
+  describe "GET /users/:id/streams" do
+    test "get a user's streams" do
+      user = insert(:user)
+      insert_list(2, :stream, user: user)
+
+      conn = get(
+        build_conn(),
+        "/api/v1/users/#{user.id}/streams"
+      )
+
+      response = json_response(conn, 200)["data"]
+
+      assert 2 == Enum.count(response)
+    end
+  end
+
   describe "POST /users/auth (password grant type)" do
     setup do
       user = :user
