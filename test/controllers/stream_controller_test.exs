@@ -43,7 +43,6 @@ defmodule Streamr.StreamControllerTest do
              |> Enum.all?(&(user.id == String.to_integer(&1)))
 
       assert 2 == Enum.count(response)
-
     end
   end
 
