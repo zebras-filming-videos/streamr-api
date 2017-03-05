@@ -118,4 +118,16 @@ defmodule Streamr.StreamControllerTest do
       assert body["data"]["relationships"]["user"]["data"]["id"] == Integer.to_string(user.id)
     end
   end
+
+  describe "DELETE /api/v1/streams/:id" do
+    test "it deletes the stream" do
+      user = insert(:user)
+      stream = insert(:stream, user: user)
+
+      conn = delete_authorized(user, "/api/v1/streams/#{stream.id}")
+      body = json_response(conn, 204)
+
+      refute Repo.get(Stream, stream.id)
+    end
+  end
 end

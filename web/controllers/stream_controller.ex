@@ -43,6 +43,22 @@ defmodule Streamr.StreamController do
     render conn, "show.json-api", data: stream
   end
 
+  def delete(conn, %{"id" => id}) do
+    stream = Repo.get!(Stream, id)
+
+    case Repo.delete(stream) do
+    {:ok, stream} ->
+      conn
+      |> put_status(204)
+      |> render("show.json-api", data: Repo.preload(stream, :user))
+
+    {:error, _} ->
+      conn
+      |> put_status(400)
+      |> render("errors.json-api")
+    end
+  end
+
   def update(conn, %{"id" => id, "stream" => stream_params}) do
     stream = Repo.get!(Stream, id)
     changeset = Stream.changeset(stream, stream_params)
@@ -52,7 +68,8 @@ defmodule Streamr.StreamController do
         conn
         |> put_status(200)
         |> render("show.json-api", data: Repo.preload(stream, :user))
-      {:err, changeset} ->
+
+      {:error, changeset} ->
         conn
         |> put_status(422)
         |> render("errors.json-api", data: changeset)
