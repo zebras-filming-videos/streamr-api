@@ -1,7 +1,14 @@
 defmodule Streamr.StreamUploader do
   alias Streamr.Repo
+  alias Streamr.S3Service
 
   def process(stream) do
+    stream
+    |> write_to_file
+    |> S3Service.upload_file(stream)
+  end
+
+  defp write_to_file(stream) do
     file_name = file_name_for(stream)
     create_file(file_name)
 
@@ -10,6 +17,8 @@ defmodule Streamr.StreamUploader do
       |> Postgrex.stream(io_query(conn, stream), [])
       |> Enum.into(File.stream!(file_name), pg_result_to_io)
     end)
+
+    file_name
   end
 
   defp stream_data_query(stream) do
@@ -23,7 +32,7 @@ defmodule Streamr.StreamUploader do
   end
 
   defp file_name_for(stream) do
-    "stream_upload_data_#{stream.id}"
+    "exports/stream_upload_data_#{stream.id}"
   end
 
   defp pg_link_pid do
