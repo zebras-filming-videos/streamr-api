@@ -5,18 +5,18 @@ defmodule Streamr.S3Service do
   @region System.get_env("AWS_S3_REGION")
   @base_url "https://s3-#{@region}.amazonaws.com/#{@bucket_name}/"
 
-  def upload_file(filepath, model) do
-    s3_filepath = s3_path_for(model, filepath)
+  def upload_file(local_path, model) do
+    s3_path = s3_path_for(model, local_path)
 
-    filepath
+    local_path
     |> S3.Upload.stream_file
-    |> S3.upload(@bucket_name, s3_filepath)
+    |> S3.upload(@bucket_name, s3_path)
     |> ExAws.request!
 
-    s3_filepath
+    link_to(s3_path)
   end
 
-  def link_to(s3_path) do
+  defp link_to(s3_path) do
     @base_url <> s3_path
   end
 

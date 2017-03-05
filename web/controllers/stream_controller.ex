@@ -1,6 +1,6 @@
 defmodule Streamr.StreamController do
   use Streamr.Web, :controller
-  alias Streamr.{Stream, Repo, StreamData}
+  alias Streamr.{Stream, Repo, StreamData, StreamUploader}
 
   plug Streamr.Authenticate when action in [:create, :add_line]
 
@@ -54,8 +54,26 @@ defmodule Streamr.StreamController do
   end
 
   def end_stream(conn, params) do
-    stream = params |> get_stream |> Repo.preload(:stream_data)
-    StreamUploader.process(stream)
+    stream = get_stream(params)
+
+    case upload_stream_contents(stream) do
+      {:ok, _} ->
+        conn
+        |> put_status(201)
+        |> render("show.json-api", data: Repo.preload(stream, :user))
+      {:error, error} ->
+        conn
+        |> put_status(422)
+        |> render("errors.json-api", data: error)
+    end
+  end
+
+  defp upload_stream_contents(stream) do
+    s3_path = stream
+              |> Repo.preload(:stream_data)
+              |> StreamUploader.process
+
+    Stream.store_s3_path(stream, s3_path)
   end
 
   defp get_stream(params) do
