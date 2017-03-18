@@ -55,17 +55,11 @@ defmodule Streamr.StreamController do
 
   def end_stream(conn, params) do
     stream = get_stream(params)
+    Task.start_link(fn -> upload_stream_contents(stream) end)
 
-    case upload_stream_contents(stream) do
-      {:ok, _} ->
-        conn
-        |> put_status(201)
-        |> render("show.json-api", data: Repo.preload(stream, :user))
-      {:error, error} ->
-        conn
-        |> put_status(422)
-        |> render("errors.json-api", data: error)
-    end
+    conn
+    |> put_status(201)
+    |> render("show.json-api", data: Repo.preload(stream, :user))
   end
 
   defp upload_stream_contents(stream) do
