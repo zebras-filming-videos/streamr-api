@@ -47,10 +47,10 @@ defmodule Streamr.StreamController do
     stream = Repo.get!(Stream, id)
 
     case Repo.delete(stream) do
-    {:ok, stream} ->
+    {:ok, _} ->
       conn
       |> put_status(204)
-      |> render("show.json-api", data: Repo.preload(stream, :user))
+      |> json("")
 
     {:error, _} ->
       conn
