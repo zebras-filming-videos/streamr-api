@@ -48,9 +48,7 @@ defmodule Streamr.StreamController do
 
     case Repo.delete(stream) do
     {:ok, _} ->
-      conn
-      |> put_status(204)
-      |> json("")
+      send_resp(conn, 204, "")
 
     {:error, _} ->
       conn

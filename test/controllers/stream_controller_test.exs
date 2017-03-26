@@ -125,9 +125,8 @@ defmodule Streamr.StreamControllerTest do
       stream = insert(:stream, user: user)
 
       conn = delete_authorized(user, "/api/v1/streams/#{stream.id}")
-      body = json_response(conn, 204)
 
-      assert body == ""
+      assert conn.status == 204
       refute Repo.get(Stream, stream.id)
       refute Repo.get_by(StreamData, stream_id: stream.id)
     end
