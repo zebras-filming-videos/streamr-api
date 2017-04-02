@@ -2,8 +2,7 @@ defmodule Streamr.S3Service do
   alias ExAws.S3
 
   @bucket_name System.get_env("AWS_S3_BUCKET_NAME")
-  @region System.get_env("AWS_S3_REGION")
-  @base_url "https://s3-#{@region}.amazonaws.com/#{@bucket_name}/"
+  @cloudfront_url System.get_env("CLOUDFRONT_URL")
 
   def upload_file(local_path, model) do
     s3_path = s3_path_for(model, local_path)
@@ -17,7 +16,7 @@ defmodule Streamr.S3Service do
   end
 
   defp link_to(s3_path) do
-    @base_url <> s3_path
+    @cloudfront_url <> s3_path
   end
 
   defp s3_path_for(model, filepath) do

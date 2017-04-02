@@ -46,7 +46,7 @@ defmodule Streamr.Stream do
       where: stream.user_id == ^user_id
   end
 
-  def store_s3_path(stream, s3_path) do
+  def store_cloudfront_url(stream, cloudfront_url) do
     params = %{s3_path: s3_path}
 
     stream
