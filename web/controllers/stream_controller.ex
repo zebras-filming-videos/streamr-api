@@ -109,11 +109,11 @@ defmodule Streamr.StreamController do
   end
 
   defp upload_stream_contents(stream) do
-    s3_path = stream
+    stream_data_url = stream
               |> Repo.preload(:stream_data)
               |> StreamUploader.process
 
-    Stream.store_cloudfront_url(stream, cloudfront_url)
+    Stream.store_data_url(stream, stream_data_url)
   end
 
   defp get_stream(params) do
