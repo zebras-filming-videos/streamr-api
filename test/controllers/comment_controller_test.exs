@@ -17,17 +17,37 @@ defmodule Streamr.CommentControllerTest do
       )
 
       response = json_response(conn, 200)["data"]
-
-      assert response
-              |> Enum.map(&(&1["relationships"]["stream"]["data"]["id"]))
-              |> Enum.all?(&(stream.id == String.to_integer(&1)))
-
       assert 3 == Enum.count(response)
     end
   end
 
-  describe "POST /api/v1/comments" do
+  describe "POST /api/v1/streams/:stream_id/comments" do
     test "it creates a new comment" do
+      stream = insert(:stream)
+      user = insert(:user)
+
+      conn = post_authorized(
+        user,
+        "/api/v1/streams/#{stream.id}/comments",
+        %{comment: %{body: "test body"}}
+      )
+
+      response = json_response(conn, 201)["data"]
+
+      assert response["attributes"]["body"] == "test body"
+    end
+
+    test "it prevents commenting unless the user is signed in" do
+      stream = insert(:stream)
+      user = insert(:user)
+
+      conn = post(
+        build_conn(),
+        "/api/v1/streams/#{stream.id}/comments",
+        %{comment: %{body: "test body"}}
+      )
+
+      response = json_response(conn, 401)
     end
   end
 
