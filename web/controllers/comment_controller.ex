@@ -1,7 +1,7 @@
 defmodule Streamr.CommentController do
   use Streamr.Web, :controller
 
-  alias Streamr.{Comment, Repo, Stream}
+  alias Streamr.{Comment, Repo}
 
   plug Streamr.Authenticate when action in [:create, :delete]
 

@@ -7,9 +7,9 @@ defmodule Streamr.CommentTest do
   describe ".ordered" do
     test "returns newest comments first" do
       stream = insert(:stream)
-      oldest = build(:comment, stream: stream, inserted_at: days_ago(5)) |> insert
-      newest = build(:comment, stream: stream, inserted_at: days_ago(0)) |> insert
-      middle = build(:comment, stream: stream, inserted_at: days_ago(3)) |> insert
+      oldest = insert_comment(stream, 5)
+      newest = insert_comment(stream, 0)
+      middle = insert_comment(stream, 3)
 
       comment_ids = stream.id
                     |> Comment.for_stream()
@@ -19,6 +19,10 @@ defmodule Streamr.CommentTest do
 
       assert comment_ids == [newest.id, middle.id, oldest.id]
     end
+  end
+
+  defp insert_comment(stream, offset) do
+    :comment |> build(stream: stream, inserted_at: days_ago(offset)) |> insert
   end
 
   defp days_ago(offset) do

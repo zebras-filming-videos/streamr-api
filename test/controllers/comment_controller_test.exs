@@ -3,7 +3,7 @@ defmodule Streamr.CommentControllerTest do
 
   import Streamr.Factory
 
-  alias Streamr.{Repo, Comment, Stream}
+  alias Streamr.{Repo, Comment}
 
   describe "GET /api/v1/streams/:stream_id/comments" do
     test "get a stream's comments" do
@@ -39,7 +39,6 @@ defmodule Streamr.CommentControllerTest do
 
     test "it prevents commenting unless the user is signed in" do
       stream = insert(:stream)
-      user = insert(:user)
 
       conn = post(
         build_conn(),
@@ -47,7 +46,7 @@ defmodule Streamr.CommentControllerTest do
         %{comment: %{body: "test body"}}
       )
 
-      response = json_response(conn, 401)
+      json_response(conn, 401)
     end
   end
 
@@ -69,7 +68,7 @@ defmodule Streamr.CommentControllerTest do
         "/api/v1/comments/#{comment.id}"
       )
 
-      response = json_response(conn, 401)
+      json_response(conn, 401)
     end
   end
 end
