@@ -45,7 +45,9 @@ defmodule Streamr.Factory do
 
   def comment_factory do
     %Streamr.Comment{
-      body: sequence(:body, &"comment-#{&1}")
+      body: sequence(:body, &"comment-#{&1}"),
+      stream: build(:stream),
+      user: build(:user)
     }
   end
 

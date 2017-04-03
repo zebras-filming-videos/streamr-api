@@ -5,7 +5,7 @@ defmodule Streamr.Comment do
 
   schema "comments" do
     belongs_to :stream, Streamr.Stream
-
+    belongs_to :user, Streamr.User
     field :body, :string, null: false
 
     timestamps()
@@ -17,19 +17,19 @@ defmodule Streamr.Comment do
     |> validate_required([:body])
   end
 
-  def with_streams(query) do
+  def with_users(query) do
     from comment in query,
-    preload: [:stream],
+    preload: [:user],
     select: comment
   end
 
   def ordered(query) do
     from comment in query,
-    order_by: [asc: comment.id]
+    order_by: [asc: comment.inserted_at]
   end
 
   def for_stream(stream_id) do
     from comment in Streamr.Comment,
-      where: comment.stream_id == ^stream_id
+    where: comment.stream_id == ^stream_id
   end
 end
