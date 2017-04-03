@@ -2,6 +2,7 @@ defmodule Streamr.Comment do
   use Streamr.Web, :model
   use Timex.Ecto.Timestamps
   alias Streamr.Repo
+  import Ecto.Query
 
   schema "comments" do
     belongs_to :stream, Streamr.Stream
@@ -25,7 +26,7 @@ defmodule Streamr.Comment do
 
   def ordered(query) do
     from comment in query,
-    order_by: [asc: comment.inserted_at]
+    order_by: [desc: comment.inserted_at]
   end
 
   def for_stream(stream_id) do
