@@ -33,6 +33,20 @@ defmodule Streamr.CommentController do
     end
   end
 
+  def delete(conn, %{"id" => id}) do
+    comment = Repo.get!(Comment, id)
+
+    case Repo.delete(comment) do
+    {:ok, _} ->
+      send_resp(conn, 204, "")
+
+    {:error, _} ->
+      conn
+      |> put_status(400)
+      |> render("errors.json-api")
+    end
+  end
+
   defp build_comment(conn, stream_id) do
     %Comment{
       stream_id: String.to_integer(stream_id),

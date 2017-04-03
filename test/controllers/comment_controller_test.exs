@@ -53,6 +53,23 @@ defmodule Streamr.CommentControllerTest do
 
   describe "DELETE /api/v1/comments/:id" do
     test "it deletes the stream" do
+      comment = insert(:comment)
+
+      response = delete_authorized(comment.user, "/api/v1/comments/#{comment.id}")
+
+      assert response.status == 204
+      refute Repo.get(Comment, comment.id)
+    end
+
+    test "it prevents deleting unless the user is signed in" do
+      comment = insert(:comment)
+
+      conn = delete(
+        build_conn(),
+        "/api/v1/comments/#{comment.id}"
+      )
+
+      response = json_response(conn, 401)
     end
   end
 end
