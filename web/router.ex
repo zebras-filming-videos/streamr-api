@@ -26,6 +26,9 @@ defmodule Streamr.Router do
     get "/users/my_subscribers", UserController, :my_subscribers
     resources "/users", UserController, only: [:create, :show] do
       resources "/streams", StreamController, only: [:index]
+
+      post "/subscribe", UserController, :subscribe
+      post "/unsubscribe", UserController, :unsubscribe
     end
 
     resources "/streams", StreamController do

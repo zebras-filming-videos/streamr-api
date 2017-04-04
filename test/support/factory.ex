@@ -6,8 +6,11 @@ defmodule Streamr.Factory do
     %Streamr.User{
       name: sequence(:username, &"User-#{&1}"),
       email: sequence(:email, &"example#{&1}@example.com"),
-      password: "password"
     }
+  end
+
+  def with_password(user) do
+    %{user | password: "password"}
   end
 
   def refresh_token_factory do

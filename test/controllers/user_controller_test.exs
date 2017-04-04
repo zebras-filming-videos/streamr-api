@@ -6,7 +6,7 @@ defmodule Streamr.UserControllerTest do
 
   describe "POST /users" do
     test "with valid user data", %{conn: conn} do
-      valid_user = params_for(:user)
+      valid_user = params_for(:user) |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => valid_user}
       body = json_response(conn, 201)
@@ -19,14 +19,14 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "with valid user data, sends email for verification", %{conn: conn} do
-      valid_user = params_for(:user)
+      valid_user = params_for(:user) |> with_password()
 
       post conn, "api/v1/users", %{"user" => valid_user}
       assert_email_sent Streamr.Email.welcome(valid_user)
     end
 
     test "with invalid data", %{conn: conn} do
-      invalid_user = params_for(:user, email: nil)
+      invalid_user = params_for(:user, email: nil) |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => invalid_user}
       body = json_response(conn, 422)["errors"]
@@ -37,7 +37,7 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "when a user exists with the email", %{conn: conn} do
-      valid_user = params_for(:user)
+      valid_user = params_for(:user) |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => valid_user}
       json_response(conn, 201)
@@ -71,7 +71,8 @@ defmodule Streamr.UserControllerTest do
   describe "POST /users/auth (password grant type)" do
     setup do
       user = :user
-             |> build(password: "password")
+             |> build()
+             |> with_password()
              |> set_password("password")
              |> insert
 
@@ -225,6 +226,35 @@ defmodule Streamr.UserControllerTest do
       conn = get(build_conn(), "/api/v1/users/my_subscribers")
 
       json_response(conn, 401)
+    end
+  end
+
+  describe "POST /api/v1/users/:id/subscribe" do
+    test "it subscribes the current user to the specified user" do
+      [me, other] = insert_list(2, :user)
+
+      conn = post_authorized(me, "/api/v1/users/#{other.id}/subscribe")
+
+      assert conn.status == 200
+      assert [other] == Repo.preload(me, :subscriptions).subscriptions
+    end
+
+    test "it prevents subscribing unless the user is logged in" do
+    end
+  end
+
+  describe "POST /api/v1/users/:id/unsubscribe" do
+    test "it unsubscribes the current user to the specified user" do
+      [me, other] = insert_list(2, :user)
+      insert(:user_subscription, subscriber: me, subscription: other)
+
+      conn = post_authorized(me, "/api/v1/users/#{other.id}/unsubscribe")
+
+      assert conn.status == 204
+      assert [] == Repo.preload(me, :subscriptions).subscriptions
+    end
+
+    test "it prevents unsubscribing unless the user is logged in" do
     end
   end
 end

@@ -7,4 +7,9 @@ defmodule Streamr.UserSubscription do
 
     timestamps()
   end
+
+  def new_subscription_changeset(subscription, params) do
+    subscription
+    |> cast(params, [:subscription_id, :subscriber_id])
+  end
 end
