@@ -6,8 +6,15 @@ defmodule Streamr.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+
     has_many :streams, Streamr.Stream
     has_many :comment, Streamr.Comment, on_delete: :delete_all
+
+    has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscription_id
+    has_many :subscribers, through: [:_subscriptions, :subscriber_id]
+
+    has_many :_subscribers, Streamr.UserSubscription, foreign_key: :subscriber_id
+    has_many :subscriptions, through: [:_subscribers, :subscription_id], foreign_key: :subscriber_id
 
     timestamps()
   end
