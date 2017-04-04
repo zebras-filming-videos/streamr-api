@@ -1,7 +1,9 @@
 defmodule Streamr.UserController do
   use Streamr.Web, :controller
-  plug Streamr.Authenticate when action in [:me, :my_subscribers, :my_subscriptions]
   alias Streamr.{User, RefreshToken, Repo, Mailer, Email, UserSubscription}
+
+  plug Streamr.Authenticate
+    when action in [:me, :my_subscribers, :my_subscriptions, :subscribe, :unsubscribe]
 
   def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)

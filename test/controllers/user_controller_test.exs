@@ -240,6 +240,10 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "it prevents subscribing unless the user is logged in" do
+      user = insert(:user)
+      conn = post(build_conn(), "/api/v1/users/#{user.id}/subscribe")
+
+      json_response(conn, 401)
     end
   end
 
@@ -255,6 +259,10 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "it prevents unsubscribing unless the user is logged in" do
+      user = insert(:user)
+      conn = post(build_conn(), "/api/v1/users/#{user.id}/unsubscribe")
+
+      json_response(conn, 401)
     end
   end
 end
