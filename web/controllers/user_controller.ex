@@ -64,15 +64,15 @@ defmodule Streamr.UserController do
   end
 
   def my_subscriptions(conn, _assigns) do
-    subscriptions = conn |> Guardian.Plug.current_resource() |> User.subscriptions() |> Repo.all()
+    user = conn.assigns[:current_user] |> Repo.preload(:subscriptions)
 
-    render(conn, "index.json-api", data: subscriptions)
+    render(conn, "index.json-api", data: user.subscriptions)
   end
 
   def my_subscribers(conn, _assigns) do
-    subscribers = conn |> Guardian.Plug.current_resource() |> User.subscribed_to() |> Repo.all()
+    user = conn.assigns[:current_user] |> Repo.preload(:subscribers)
 
-    render(conn, "index.json-api", data: subscribers)
+    render(conn, "index.json-api", data: user.subscribers)
   end
 
   defp generate_access_token(conn, user) do

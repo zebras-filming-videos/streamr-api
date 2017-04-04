@@ -11,29 +11,13 @@ defmodule Streamr.User do
     has_many :streams, Streamr.Stream
     has_many :comment, Streamr.Comment, on_delete: :delete_all
 
-    has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscriber_id
-    has_many :subscribers, through: [:_subscriptions, :subscriber_id]
-
     has_many :_subscribers, Streamr.UserSubscription, foreign_key: :subscription_id
-    has_many :subscriptions,
-      through: [:_subscribers, :subscription_id],
-      foreign_key: :subscription_id
+    has_many :subscribers, through: [:_subscribers, :subscriber]
+
+    has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscriber_id
+    has_many :subscriptions, through: [:_subscriptions, :subscription]
 
     timestamps()
-  end
-
-  def subscriptions(user) do
-    from u in User,
-    join: s in UserSubscription,
-    on: s.subscriber_id == u.id,
-    where: u.id == ^user.id
-  end
-
-  def subscribed_to(user) do
-    from u in User,
-    join: s in UserSubscription,
-    on: s.subscription_id == u.id,
-    where: u.id == ^user.id
   end
 
   def changeset(model, params \\ :empty) do
