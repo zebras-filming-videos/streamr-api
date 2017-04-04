@@ -6,7 +6,7 @@ defmodule Streamr.UserControllerTest do
 
   describe "POST /users" do
     test "with valid user data", %{conn: conn} do
-      valid_user = params_for(:user) |> with_password()
+      valid_user = :user |> params_for() |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => valid_user}
       body = json_response(conn, 201)
@@ -19,14 +19,14 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "with valid user data, sends email for verification", %{conn: conn} do
-      valid_user = params_for(:user) |> with_password()
+      valid_user = :user |> params_for() |> with_password()
 
       post conn, "api/v1/users", %{"user" => valid_user}
       assert_email_sent Streamr.Email.welcome(valid_user)
     end
 
     test "with invalid data", %{conn: conn} do
-      invalid_user = params_for(:user, email: nil) |> with_password()
+      invalid_user = :user |> params_for(email: nil) |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => invalid_user}
       body = json_response(conn, 422)["errors"]
@@ -37,7 +37,7 @@ defmodule Streamr.UserControllerTest do
     end
 
     test "when a user exists with the email", %{conn: conn} do
-      valid_user = params_for(:user) |> with_password()
+      valid_user = :user |> params_for() |> with_password()
 
       conn = post conn, "api/v1/users", %{"user" => valid_user}
       json_response(conn, 201)
