@@ -71,6 +71,13 @@ defmodule Streamr.Factory do
     }
   end
 
+  def user_subscription_factory do
+    %Streamr.UserSubscription{
+      subscriber: build(:user),
+      subscription: build(:user)
+    }
+  end
+
   def set_password(user, password) do
     hashed_password = Comeonin.Bcrypt.hashpwsalt(password)
     %{user | password_hash: hashed_password}

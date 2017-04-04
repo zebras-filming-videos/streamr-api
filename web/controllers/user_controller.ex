@@ -1,6 +1,6 @@
 defmodule Streamr.UserController do
   use Streamr.Web, :controller
-  plug Streamr.Authenticate when action in [:me]
+  plug Streamr.Authenticate when action in [:me, :my_subscribers, :my_subscriptions]
   alias Streamr.{User, RefreshToken, Repo, Mailer, Email}
 
   def create(conn, %{"user" => user_params}) do
@@ -61,6 +61,18 @@ defmodule Streamr.UserController do
 
   def me(conn, _assigns) do
     render(conn, "show.json-api", data: Guardian.Plug.current_resource(conn))
+  end
+
+  def my_subscriptions(conn, _assigns) do
+    subscriptions = conn |> Guardian.Plug.current_resource() |> User.subscriptions() |> Repo.all()
+
+    render(conn, "index.json-api", data: subscriptions)
+  end
+
+  def my_subscribers(conn, _assigns) do
+    subscribers = conn |> Guardian.Plug.current_resource() |> User.subscribed_to() |> Repo.all()
+
+    render(conn, "index.json-api", data: subscribers)
   end
 
   defp generate_access_token(conn, user) do

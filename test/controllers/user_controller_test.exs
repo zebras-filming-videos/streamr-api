@@ -189,4 +189,42 @@ defmodule Streamr.UserControllerTest do
       json_response(conn, 401)
     end
   end
+
+  describe "GET /api/v1/users/my_subscriptions" do
+    test "returns users I subscribe to" do
+      me = insert(:user)
+      subscriptions = insert_list(3, :user_subscription, subscriber: me)
+      _others = insert_list(2, :user_subscription, subscriber: insert(:user))
+
+      conn = get_authorized(me, "/api/v1/users/my_subscriptions")
+
+      response = json_response(conn, 200)["data"]
+      assert Enum.count(response) == Enum.count(subscriptions)
+    end
+
+    test "fails without an auth token" do
+      conn = get(build_conn(), "/api/v1/users/my_subscriptions")
+
+      json_response(conn, 401)
+    end
+  end
+
+  describe "GET /api/v1/users/my_subscribers" do
+    test "returns all users subscribed to me" do
+      me = insert(:user)
+      subscribers = insert_list(3, :user_subscription, subscription: me)
+      _others = insert_list(2, :user_subscription, subscription: insert(:user))
+
+      conn = get_authorized(me, "/api/v1/users/my_subscribers")
+
+      response = json_response(conn, 200)["data"]
+      assert Enum.count(response) == Enum.count(subscribers)
+    end
+
+    test "fails without an auth token" do
+      conn = get(build_conn(), "/api/v1/users/my_subscribers")
+
+      json_response(conn, 401)
+    end
+  end
 end
