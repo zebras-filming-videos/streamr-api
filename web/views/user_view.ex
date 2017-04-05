@@ -5,9 +5,13 @@ defmodule Streamr.UserView do
 
   attributes [:name, :email, :current_user_subscribed]
 
-  def current_user_subscribed(user, %Plug.Conn{assigns: %{current_user: nil}}), do: false
+  def current_user_subscribed(_user, %Plug.Conn{assigns: %{current_user: nil}}), do: false
   def current_user_subscribed(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
-    !!Repo.get_by(UserSubscription, subscriber_id: current_user.id, subscription_id: user.id)
+    if Ecto.assoc_loaded?(current_user.subscriptions) do
+      current_user.subscriptions.member?(user)
+    else
+      !!Repo.get_by(UserSubscription, subscriber_id: current_user.id, subscription_id: user.id)
+    end
   end
 
   def render("access_token.json", %{access_token: access_token}) do

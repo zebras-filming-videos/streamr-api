@@ -222,6 +222,16 @@ defmodule Streamr.UserControllerTest do
       assert Enum.count(response) == Enum.count(subscriptions)
     end
 
+    test "my subscriptions show that I am subscribed" do
+      me = insert(:user)
+      insert_list(3, :user_subscription, subscriber: me)
+
+      conn = get_authorized(me, "/api/v1/users/my_subscriptions")
+
+      response = json_response(conn, 200)["data"]
+      assert Enum.all?(response, &(&1["attributes"]["current-user-subscribed"]))
+    end
+
     test "fails without an auth token" do
       conn = get(build_conn(), "/api/v1/users/my_subscriptions")
 
