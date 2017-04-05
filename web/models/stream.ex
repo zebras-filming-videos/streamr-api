@@ -49,6 +49,11 @@ defmodule Streamr.Stream do
     where: stream.user_id == ^user_id
   end
 
+  def for_topic(topic_id) do
+    from stream in Streamr.Stream,
+    where: stream.topic_id == ^topic_id
+  end
+
   def subscribed(user) do
     from stream in Streamr.Stream,
     inner_join: sub in UserSubscription, on: sub.subscriber_id == ^user.id,

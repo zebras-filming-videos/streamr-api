@@ -5,8 +5,8 @@ defmodule Streamr.StreamController do
   plug Streamr.Authenticate when action in [:create, :add_line, :subscribed]
 
   def index(conn, params) do
-    streams = params["user_id"]
-              |> filtered_streams
+    streams = params
+              |> filtered_streams(conn)
               |> Stream.with_users
               |> Stream.ordered
               |> Repo.paginate(params)
@@ -135,11 +135,15 @@ defmodule Streamr.StreamController do
     Repo.get!(Stream, Map.get(params, "stream_id"))
   end
 
-  defp filtered_streams(user_id) do
+  defp filtered_streams(params) do
     if user_id do
       Stream.for_user(user_id)
     else
       Stream
     end
   end
+
+  defp filtered_streams(%{"user_id" => user_id}), do: Stream.for_user(user_id)
+  defp filtered_streams(%{"topic_id" => topic_id}), do: Stream.for_topic(topic_id)
+  defp filtered_streams(_params), do: Stream
 end
