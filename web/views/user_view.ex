@@ -1,8 +1,14 @@
 defmodule Streamr.UserView do
   use Streamr.Web, :view
   use JaSerializer.PhoenixView
+  alias Streamr.{Repo, UserSubscription}
 
-  attributes [:name, :email]
+  attributes [:name, :email, :current_user_subscribed]
+
+  def current_user_subscribed(user, %Plug.Conn{assigns: %{current_user: nil}}), do: false
+  def current_user_subscribed(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
+    !!Repo.get_by(UserSubscription, subscriber_id: current_user.id, subscription_id: user.id)
+  end
 
   def render("access_token.json", %{access_token: access_token}) do
     %{

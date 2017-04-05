@@ -66,6 +66,25 @@ defmodule Streamr.UserControllerTest do
 
       assert String.to_integer(response["id"]) == user.id
     end
+
+    test "current_user_subscribed is true if the user is subscribed" do
+      [me, other] = insert_list(2, :user)
+      insert(:user_subscription, subscriber: me, subscription: other)
+
+      conn = get_authorized(me, "/api/v1/users/#{other.id}")
+      response = json_response(conn, 200)["data"]
+
+      assert response["attributes"]["current-user-subscribed"]
+    end
+
+    test "current_user_subscribed is false if the user is unsubscribed" do
+      [me, other] = insert_list(2, :user)
+
+      conn = get_authorized(me, "/api/v1/users/#{other.id}")
+      response = json_response(conn, 200)["data"]
+
+      refute response["attributes"]["current-user-subscribed"]
+    end
   end
 
   describe "POST /users/auth (password grant type)" do
