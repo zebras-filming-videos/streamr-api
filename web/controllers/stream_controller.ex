@@ -7,8 +7,8 @@ defmodule Streamr.StreamController do
   def index(conn, params) do
     streams = params
               |> filtered_streams()
-              |> Stream.with_users
-              |> Stream.ordered
+              |> Stream.with_associations()
+              |> Stream.ordered()
               |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
@@ -17,7 +17,7 @@ defmodule Streamr.StreamController do
   def subscribed(conn, params) do
     streams = conn.assigns[:current_user]
               |> Stream.subscribed()
-              |> Stream.with_users()
+              |> Stream.with_associations()
               |> Stream.ordered()
               |> Repo.paginate(params)
 
@@ -36,7 +36,7 @@ defmodule Streamr.StreamController do
 
         conn
         |> put_status(201)
-        |> render("show.json-api", data: Repo.preload(stream, :user))
+        |> render("show.json-api", data: with_associations(stream))
 
       {:error, changeset} ->
         conn
@@ -48,7 +48,7 @@ defmodule Streamr.StreamController do
   def show(conn, %{"id" => slug}) do
     stream = Stream
              |> Repo.get_by_slug(slug)
-             |> Repo.preload(:user)
+             |> with_associations()
 
     render conn, "show.json-api", data: stream
   end
@@ -77,7 +77,7 @@ defmodule Streamr.StreamController do
       {:ok, stream} ->
         conn
         |> put_status(200)
-        |> render("show.json-api", data: Repo.preload(stream, :user))
+        |> render("show.json-api", data: with_associations(stream))
 
       {:error, changeset} ->
         conn
@@ -109,7 +109,7 @@ defmodule Streamr.StreamController do
 
         conn
         |> put_status(201)
-        |> render("show.json-api", data: Repo.preload(stream, :user))
+        |> render("show.json-api", data: with_associations(stream))
       {:error, changeset} ->
         conn
         |> put_status(422)
@@ -129,6 +129,10 @@ defmodule Streamr.StreamController do
               |> StreamUploader.process
 
     Stream.store_s3_key(stream, stream_s3_key)
+  end
+
+  defp with_associations(stream) do
+    Repo.preload(stream, [:user, :topic])
   end
 
   defp get_stream(params) do

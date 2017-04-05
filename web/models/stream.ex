@@ -34,9 +34,9 @@ defmodule Streamr.Stream do
     |> cast(%{duration: duration, published_at: published_at}, [:duration, :published_at])
   end
 
-  def with_users(query) do
+  def with_associations(query) do
     from stream in query,
-    preload: [:user],
+    preload: [:user, :topic],
     select: stream
   end
 
