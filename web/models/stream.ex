@@ -13,6 +13,7 @@ defmodule Streamr.Stream do
     field :published_at, Timex.Ecto.DateTime
 
     belongs_to :user, Streamr.User
+    belongs_to :topic, Streamr.Topic
     has_one :stream_data, Streamr.StreamData, on_delete: :delete_all
     has_many :comment, Streamr.Comment, on_delete: :delete_all
 

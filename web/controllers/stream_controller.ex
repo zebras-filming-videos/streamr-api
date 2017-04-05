@@ -6,7 +6,7 @@ defmodule Streamr.StreamController do
 
   def index(conn, params) do
     streams = params
-              |> filtered_streams(conn)
+              |> filtered_streams()
               |> Stream.with_users
               |> Stream.ordered
               |> Repo.paginate(params)
@@ -133,14 +133,6 @@ defmodule Streamr.StreamController do
 
   defp get_stream(params) do
     Repo.get!(Stream, Map.get(params, "stream_id"))
-  end
-
-  defp filtered_streams(params) do
-    if user_id do
-      Stream.for_user(user_id)
-    else
-      Stream
-    end
   end
 
   defp filtered_streams(%{"user_id" => user_id}), do: Stream.for_user(user_id)
