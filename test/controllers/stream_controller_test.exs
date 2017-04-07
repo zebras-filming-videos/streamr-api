@@ -34,8 +34,8 @@ defmodule Streamr.StreamControllerTest do
       conn = get(build_conn(), "/api/v1/topics/#{topic.id}/streams")
       response = json_response(conn, 200)["data"]
 
-      stream_ids_in_topic = streams_in_topic |> Enum.map(&(&1.id))
-      response_ids = response |> Enum.map(&(String.to_integer(&1["id"])))
+      stream_ids_in_topic = streams_in_topic |> Enum.map(&(&1.id)) |> Enum.sort
+      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
 
       assert stream_ids_in_topic == response_ids
     end
@@ -57,8 +57,8 @@ defmodule Streamr.StreamControllerTest do
 
       response = json_response(conn, 200)["data"]
 
-      subscribed_stream_ids = params.subscribed_users_streams |> Enum.map(&(&1.id))
-      response_ids = response |> Enum.map(&(String.to_integer(&1["id"])))
+      subscribed_stream_ids = params.subscribed_users_streams |> Enum.map(&(&1.id)) |> Enum.sort
+      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
 
       assert subscribed_stream_ids == response_ids
     end
