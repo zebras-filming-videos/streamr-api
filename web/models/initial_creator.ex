@@ -28,7 +28,7 @@ defmodule Streamr.InitialCreator do
         "-fill", text_color(background_color),
         "-pointsize", "300",
         "-gravity", "center",
-        "-annotate", "+0+75", initials,
+        "-annotate", "+0+25", initials,
         "-resample", "72",
         filepath
     ]
