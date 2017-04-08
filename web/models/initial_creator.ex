@@ -12,12 +12,12 @@ defmodule Streamr.InitialCreator do
   end
 
   defp generate_image(filepath, user) do
-    System.cmd("convert", params_for(user) ++ [filepath])
+    System.cmd("convert", params_for(user, filepath))
 
     filepath
   end
 
-  defp params_for(user) do
+  defp params_for(user, filepath) do
     initials = user.name |> String.split(" ") |> format_initials()
     background_color = generate_background_color(user)
 
@@ -29,7 +29,8 @@ defmodule Streamr.InitialCreator do
         "-pointsize", "300",
         "-gravity", "center",
         "-annotate", "+0+75", initials,
-        "-resample", "72"
+        "-resample", "72",
+        filepath
     ]
   end
 
