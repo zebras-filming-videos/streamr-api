@@ -1,52 +1,47 @@
 defmodule Streamr.InitialCreator do
-  @size 512
-  @resolution 72
-  @sampling_factor 3
-  @density @resolution * @sampling_factor
-
-  import IEx
-
   def process(user) do
-    size = 512
-    resolution = 72
-    sampling_factor = 3
-    initials = user.name |> String.split(" ") |> format_initials()
+    System.cmd "convert", params_for(user)
+  end
 
-    System.cmd "convert", [
-      "-density", "#{resolution * sampling_factor}",                # sample up
-      "-size", "#{size*sampling_factor}x#{size*sampling_factor}",   # corrected size
-      "canvas:##{background_color(user)}",
-      "-fill", user |> background_color |> text_color,                                           # text color
-      "-font", "/Library/Fonts/Roboto-Bold.ttf",                    # font location
-      "-pointsize", "300",                                          # font size
-      "-gravity", "center",                                         # center text
-      "-annotate", "+0+#{25 * sampling_factor}", initials,          # render text, move down a bit
-      "-resample", "#{resolution}",                                 # sample down to reduce aliasing
-      "#{user.id}.png"
+  defp params_for(user) do
+    initials = user.name |> String.split(" ") |> format_initials()
+    background_color = generate_background_color(user)
+
+    [
+        "-density", "216",
+        "-size", "1536x1536",
+        "canvas:##{background_color}",
+        "-fill", text_color(background_color),
+        "-pointsize", "300",
+        "-gravity", "center",
+        "-annotate", "+0+75", initials,
+        "-resample", "72",
+        "#{user.id}.png"
     ]
   end
 
-  defp size do
-    "#{@density}x#{@density}"
-  end
-
-  defp background_color(user) do
+  defp generate_background_color(user) do
     :sha256
-    |> :crypto.hash(user.name)
+    |> :crypto.hash(user.name <> user.email)
     |> Base.encode16()
     |> String.slice(0..5)
   end
 
   defp text_color(background_color) do
-    [red, green, blue] =
-      background_color
-      |> String.graphemes()
-      |> Enum.chunk(2)
-      |> Enum.map(fn(chunk) -> String.to_integer(Enum.join(chunk), 16) end)
+    luminance = background_color |> extract_rgb() |> calculate_luminance()
 
-    result = (red * 299 + green * 587 + blue * 114) / 1000
+    if (luminance > 125), do: "#000000", else: "#ffffff"
+  end
 
-    if (result > 125), do: "#000000", else: "#ffffff"
+  defp calculate_luminance([red, green, blue]) do
+    (red * 299 + green * 587 + blue * 114) / 1000
+  end
+
+  defp extract_rgb(hex) do
+    hex
+    |> String.graphemes()
+    |> Enum.chunk(2)
+    |> Enum.map(fn(chunk) -> String.to_integer(Enum.join(chunk), 16) end)
   end
 
   defp format_initials(names) do
