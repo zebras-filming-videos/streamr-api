@@ -1,9 +1,11 @@
 defmodule Streamr.UserView do
   use Streamr.Web, :view
   use JaSerializer.PhoenixView
-  alias Streamr.{Repo, UserSubscription}
+  alias Streamr.{Repo, User, UserSubscription}
 
-  attributes [:name, :email, :current_user_subscribed]
+  @cdn_url System.get_env("CLOUDFRONT_URL")
+
+  attributes [:name, :email, :current_user_subscribed, :image_url]
 
   def current_user_subscribed(_user, %Plug.Conn{assigns: %{current_user: nil}}), do: false
   def current_user_subscribed(user, %Plug.Conn{assigns: %{current_user: current_user}}) do
@@ -12,6 +14,11 @@ defmodule Streamr.UserView do
     else
       !!Repo.get_by(UserSubscription, subscriber_id: current_user.id, subscription_id: user.id)
     end
+  end
+
+  def image_url(%User{image_s3_key: nil}, _conn), do: nil
+  def image_url(%User{image_s3_key: image_s3_key}, _conn) do
+    @cdn_url <> image_s3_key
   end
 
   def render("access_token.json", %{access_token: access_token}) do
