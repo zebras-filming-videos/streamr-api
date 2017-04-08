@@ -1,6 +1,20 @@
 defmodule Streamr.InitialCreator do
+  alias Streamr.{S3Service, User, Repo}
+
   def process(user) do
-    System.cmd "convert", params_for(user)
+    filepath = filepath_for(user)
+
+    filepath
+    |> generate_image(user)
+    |> S3Service.upload_file(user)
+    |> User.image_key_changeset(user)
+    |> Repo.update()
+  end
+
+  defp generate_image(filepath, user) do
+    System.cmd("convert", params_for(user) ++ [filepath])
+
+    filepath
   end
 
   defp params_for(user) do
@@ -15,8 +29,7 @@ defmodule Streamr.InitialCreator do
         "-pointsize", "300",
         "-gravity", "center",
         "-annotate", "+0+75", initials,
-        "-resample", "72",
-        "#{user.id}.png"
+        "-resample", "72"
     ]
   end
 
@@ -49,6 +62,8 @@ defmodule Streamr.InitialCreator do
     |> limit_names()
     |> Enum.reduce("", fn(name, initials) -> initials <> String.first(name) end)
   end
+
+  defp filepath_for(user), do: "uploads/user_initials_#{user.id}.png"
 
   defp limit_names([first_name]), do: [first_name]
   defp limit_names([first_name | other_names]), do: [first_name, List.last(other_names)]

@@ -106,10 +106,8 @@ defmodule Streamr.UserController do
   end
 
   def register_new_user(user) do
-    Task.Supervisor.start_child Streamr.UploadSupervisor, fn ->
-      send_welcome_email(user)
-      Streamr.InitialCreator.process(user)
-    end
+    Task.Supervisor.start_child(Streamr.UploadSupervisor, fn -> send_welcome_email(user) end)
+    Task.Supervisor.start_child(Streamr.UploadSupervisor, fn -> Streamr.InitialCreator.process(user) end)
   end
 
   defp halt_if_subscribed(conn, _) do
