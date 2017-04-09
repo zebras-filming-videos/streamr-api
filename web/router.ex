@@ -34,14 +34,14 @@ defmodule Streamr.Router do
     get "/streams/subscribed", StreamController, :subscribed
     resources "/streams", StreamController do
       resources "/comments", CommentController, only: [:index, :create]
-      resources "/votes", VoteController, only: [:create]
+      post "/my_vote", VoteController, :create
 
       post "/add_line", StreamController, :add_line
       post "/end", StreamController, :end_stream
     end
 
     resources "/comments", CommentController, only: [:delete] do
-      resources "/votes", VoteController, only: [:create]
+      post "/my_vote", VoteController, :create
     end
 
     resources "/topics", TopicController, only: [:index] do
