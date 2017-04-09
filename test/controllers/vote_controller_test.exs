@@ -16,7 +16,7 @@ defmodule Streamr.VoteControllerTest do
     test "it does not create duplicate my_vote for the same user" do
       stream = insert(:stream)
       user = insert(:user)
-      insert(:vote, stream: stream, user: user)
+      Streamr.VoteManager.create(user, %{"stream_id" => stream.id})
 
       conn = post_authorized(user, "/api/v1/streams/#{stream.id}/my_vote")
 
@@ -45,7 +45,7 @@ defmodule Streamr.VoteControllerTest do
     test "it does not create duplicate my_vote for the same user" do
       comment = insert(:comment)
       user = insert(:user)
-      insert(:vote, comment: comment, user: user)
+      Streamr.VoteManager.create(user, %{"comment_id" => comment.id})
 
       conn = post_authorized(user, "/api/v1/comments/#{comment.id}/my_vote")
 
@@ -64,7 +64,7 @@ defmodule Streamr.VoteControllerTest do
     test "it removes my vote when I have voted on the stream" do
       stream = insert(:stream)
       user = insert(:user)
-      insert(:vote, stream: stream, user: user)
+      Streamr.VoteManager.create(user, %{"stream_id" => stream.id})
 
       conn = delete_authorized(user, "/api/v1/streams/#{stream.id}/my_vote")
 
@@ -92,7 +92,7 @@ defmodule Streamr.VoteControllerTest do
     test "it removes my vote when I have voted on the comment" do
       comment = insert(:comment)
       user = insert(:user)
-      insert(:vote, comment: comment, user: user)
+      Streamr.VoteManager.create(user, %{"comment_id" => comment.id})
 
       conn = delete_authorized(user, "/api/v1/comments/#{comment.id}/my_vote")
 

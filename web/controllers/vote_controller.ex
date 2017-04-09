@@ -1,13 +1,11 @@
 defmodule Streamr.VoteController do
   use Streamr.Web, :controller
 
-  alias Streamr.{Vote, Repo}
-
   plug Streamr.Authenticate
   plug :find_vote when action in [:delete]
 
   def create(conn, params) do
-    case Repo.transaction(Streamr.VoteManager.create(conn.assigns.current_user, params)) do
+    case Streamr.VoteManager.create(conn.assigns.current_user, params) do
       {:ok, _vote} -> send_resp(conn, 204, "")
       {:error, _, errors, _} ->
         conn
@@ -16,8 +14,8 @@ defmodule Streamr.VoteController do
     end
   end
 
-  def delete(conn, params) do
-    case Repo.transaction(Streamr.VoteManager.delete(conn.assigns.current_user, params)) do
+  def delete(conn, _params) do
+    case Streamr.VoteManager.delete(conn.assigns.current_user, conn.assigns.vote) do
       {:ok, _} -> send_resp(conn, 204, "")
       {:error, _, errors, _} ->
         conn
@@ -27,12 +25,12 @@ defmodule Streamr.VoteController do
   end
 
   def find_vote(conn, _) do
-    resource = get_resource(conn, conn.assigns.current_user)
+    resource = conn |> get_resource(conn.assigns.current_user) |> Repo.preload([:stream, :comment])
 
     if is_nil(resource) do
       conn |> put_status(422) |> render("missing_vote.json") |> halt
     else
-      Plug.Conn.assign(conn, :vote, get_resource(conn, conn.assigns.current_user))
+      Plug.Conn.assign(conn, :vote, resource)
     end
   end
 
