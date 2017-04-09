@@ -18,6 +18,8 @@ defmodule Streamr.User do
     has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscriber_id
     has_many :subscriptions, through: [:_subscriptions, :subscription]
 
+    has_many :votes, Streamr.Vote, on_delete: :delete_all
+
     timestamps()
   end
 
