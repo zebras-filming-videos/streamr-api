@@ -26,7 +26,7 @@ defmodule Streamr.InitialCreator do
         "-size", "1536x1536",
         "canvas:##{background_color}",
         "-fill", text_color(background_color),
-        "-pointsize", "300",
+        "-pointsize", "200",
         "-gravity", "center",
         "-annotate", "+0+25", initials,
         "-resample", "72",
