@@ -35,6 +35,7 @@ defmodule Streamr.Router do
     resources "/streams", StreamController do
       resources "/comments", CommentController, only: [:index, :create]
       post "/my_vote", VoteController, :create
+      delete "/my_vote", VoteController, :delete
 
       post "/add_line", StreamController, :add_line
       post "/end", StreamController, :end_stream
@@ -42,6 +43,7 @@ defmodule Streamr.Router do
 
     resources "/comments", CommentController, only: [:delete] do
       post "/my_vote", VoteController, :create
+      delete "/my_vote", VoteController, :delete
     end
 
     resources "/topics", TopicController, only: [:index] do

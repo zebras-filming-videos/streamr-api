@@ -2,7 +2,7 @@ defmodule Streamr.Vote do
   use Streamr.Web, :model
   import Ecto.Query
 
-  alias Streamr.{User, Comment, Stream, Repo}
+  alias Streamr.{User, Comment, Stream, Repo, Vote}
 
   schema "votes" do
     belongs_to :user, User
@@ -13,11 +13,11 @@ defmodule Streamr.Vote do
   end
 
   def count(%Stream{id: id}) do
-    count_associations(from s in Stream, where: s.id == ^id)
+    count_associations(from v in Vote, where: v.stream_id == ^id)
   end
 
   def count(%Comment{id: id}) do
-    count_associations(from c in Comment, where: c.id == ^id)
+    count_associations(from v in Vote, where: v.comment_id == ^id)
   end
 
   def changeset(vote, params \\ %{}) do

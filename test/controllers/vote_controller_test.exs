@@ -59,4 +59,60 @@ defmodule Streamr.VoteControllerTest do
       assert conn.status == 401
     end
   end
+
+  describe "DELETE /api/v1/streams/:id/my_vote" do
+    test "it removes my vote when I have voted on the stream" do
+      stream = insert(:stream)
+      user = insert(:user)
+      insert(:vote, stream: stream, user: user)
+
+      conn = delete_authorized(user, "/api/v1/streams/#{stream.id}/my_vote")
+
+      assert conn.status == 204
+      assert Streamr.Vote.count(stream) == 0
+    end
+
+    test "it returns a 422 if I have not voted on the stream" do
+      stream = insert(:stream)
+      user = insert(:user)
+
+      user
+      |> delete_authorized("/api/v1/streams/#{stream.id}/my_vote")
+      |> json_response(422)
+    end
+
+    test "it requires users to be signed in" do
+      conn = delete(build_conn(), "/api/v1/streams/#{insert(:stream).id}/my_vote")
+
+      assert conn.status == 401
+    end
+  end
+
+  describe "DELETE /api/v1/comments/:id/my_vote" do
+    test "it removes my vote when I have voted on the comment" do
+      comment = insert(:comment)
+      user = insert(:user)
+      insert(:vote, comment: comment, user: user)
+
+      conn = delete_authorized(user, "/api/v1/comments/#{comment.id}/my_vote")
+
+      assert conn.status == 204
+      assert Streamr.Vote.count(comment) == 0
+    end
+
+    test "it returns a 422 if I have not voted on the comment" do
+      comment = insert(:comment)
+      user = insert(:user)
+
+      user
+      |> delete_authorized("/api/v1/comments/#{comment.id}/my_vote")
+      |> json_response(422)
+    end
+
+    test "it requires users to be signed in" do
+      conn = delete(build_conn(), "/api/v1/comments/#{insert(:comment).id}/my_vote")
+
+      assert conn.status == 401
+    end
+  end
 end
