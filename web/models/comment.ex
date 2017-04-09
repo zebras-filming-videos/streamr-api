@@ -1,12 +1,14 @@
 defmodule Streamr.Comment do
   use Streamr.Web, :model
   use Timex.Ecto.Timestamps
+  use Streamr.Voteable
   import Ecto.Query
 
   schema "comments" do
     belongs_to :stream, Streamr.Stream
     belongs_to :user, Streamr.User
     field :body, :string, null: false
+    field :votes_count, :integer, null: false, default: 0
 
     timestamps()
   end
