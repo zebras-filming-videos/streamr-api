@@ -20,7 +20,7 @@ defmodule Streamr.VoteControllerTest do
 
       conn = post_authorized(user, "/api/v1/streams/#{stream.id}/my_vote")
 
-      json_response(conn, 422)
+      assert conn.status == 204
       assert Streamr.Vote.count(stream) == 1
     end
 
@@ -49,7 +49,7 @@ defmodule Streamr.VoteControllerTest do
 
       conn = post_authorized(user, "/api/v1/comments/#{comment.id}/my_vote")
 
-      json_response(conn, 422)
+      assert conn.status == 204
       assert Streamr.Vote.count(comment) == 1
     end
 
@@ -76,9 +76,9 @@ defmodule Streamr.VoteControllerTest do
       stream = insert(:stream)
       user = insert(:user)
 
-      user
-      |> delete_authorized("/api/v1/streams/#{stream.id}/my_vote")
-      |> json_response(422)
+      conn = delete_authorized(user, "/api/v1/streams/#{stream.id}/my_vote")
+
+      assert conn.status == 204
     end
 
     test "it requires users to be signed in" do
@@ -104,9 +104,9 @@ defmodule Streamr.VoteControllerTest do
       comment = insert(:comment)
       user = insert(:user)
 
-      user
-      |> delete_authorized("/api/v1/comments/#{comment.id}/my_vote")
-      |> json_response(422)
+      conn = delete_authorized(user, "/api/v1/streams/#{comment.id}/my_vote")
+
+      assert conn.status == 204
     end
 
     test "it requires users to be signed in" do
