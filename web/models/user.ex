@@ -23,7 +23,7 @@ defmodule Streamr.User do
     timestamps()
   end
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
     |> cast(params, [:name, :email])
     |> validate_required([:name, :email])
