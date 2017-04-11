@@ -5,7 +5,8 @@ defmodule Streamr.Stream do
   alias Streamr.{Repo, UserSubscription}
   import Ecto.Query
 
-  @similarity_limit 0.2
+  @title_similarity_threshold 0.2
+  @title_similarity_threshold 0.4
 
   schema "streams" do
     field :title, :string, null: false
@@ -34,7 +35,13 @@ defmodule Streamr.Stream do
   def search(query, nil), do: query
   def search(query, search) do
     from u in query,
-    where: fragment("similarity(?, ?) > ?", u.title, ^search, @similarity_limit)
+    where: fragment("similarity(?, ?) > ?", u.title, ^search, @title_similarity_threshold),
+    or_where: fragment(
+      "similarity(?, ?) > ?",
+      u.description,
+      ^search,
+      @description_imilarity_threshold
+    )
   end
 
   def ordered_by_search(query, search) do
