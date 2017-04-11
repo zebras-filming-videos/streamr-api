@@ -5,6 +5,7 @@ defmodule Streamr.S3Service do
   @bucket_name System.get_env("AWS_S3_BUCKET_NAME")
 
   def upload_file(local_path, model) do
+    Enum.map([1,2,3], fn x -> x + 1 end)
     resource_path = resource_path_for(model, local_path)
 
     local_path
