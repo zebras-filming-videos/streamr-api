@@ -6,7 +6,7 @@ defmodule Streamr.Stream do
   import Ecto.Query
 
   @title_similarity_threshold 0.2
-  @title_similarity_threshold 0.4
+  @description_similarity_threshold 0.4
 
   schema "streams" do
     field :title, :string, null: false
@@ -40,7 +40,7 @@ defmodule Streamr.Stream do
       "similarity(?, ?) > ?",
       u.description,
       ^search,
-      @description_imilarity_threshold
+      @description_similarity_threshold
     )
   end
 
