@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ ! -f ".env" ] ; then
+  echo "You need a .env file to run the server."
+  exit 1
+fi
+
+source .env && mix phoenix.server
