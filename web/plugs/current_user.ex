@@ -1,6 +1,6 @@
 defmodule Streamr.CurrentUser do
   alias Plug.Conn
-  alias Gaurdian.Plug
+  alias Guardian.Plug
 
   def init(opts), do: opts
 
