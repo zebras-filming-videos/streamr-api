@@ -6,21 +6,15 @@ defmodule Streamr.StreamControllerTest do
   alias Streamr.{Repo, Stream, StreamData}
 
   describe "GET /api/v1/streams" do
-    setup do
-      insert_list(2, :stream)
-
-      :ok
-    end
-
     test "it returns all streams" do
-      conn = get(
-        build_conn(),
-        "/api/v1/streams"
-      )
+      published_streams = insert_list(3, :stream)
+      _unpublished_streams = insert_list(3, :stream, published_at: nil)
 
-      response = json_response(conn, 200)["data"]
+      conn = get(build_conn(), "/api/v1/streams")
 
-      assert 2 == Enum.count(response)
+      response_ids = conn |> json_response(200) |> ids_from_response()
+
+      assert response_ids == ids_from_db(published_streams)
     end
   end
 

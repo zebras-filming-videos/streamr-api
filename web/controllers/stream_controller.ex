@@ -7,6 +7,7 @@ defmodule Streamr.StreamController do
   def index(conn, params) do
     streams = params
               |> filtered_streams()
+              |> Stream.published()
               |> Stream.with_associations()
               |> Stream.ordered()
               |> Repo.paginate(params)
@@ -17,6 +18,7 @@ defmodule Streamr.StreamController do
   def subscribed(conn, params) do
     streams = conn.assigns[:current_user]
               |> Stream.subscribed()
+              |> Stream.published()
               |> Stream.with_associations()
               |> Stream.ordered()
               |> Repo.paginate(params)

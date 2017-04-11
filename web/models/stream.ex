@@ -24,6 +24,11 @@ defmodule Streamr.Stream do
     timestamps()
   end
 
+  def published(query) do
+    from stream in query,
+    where: not is_nil(stream.published_at)
+  end
+
   def changeset(stream, params \\ %{}) do
     stream
     |> cast(params, [:title, :description, :audio_s3_key])
