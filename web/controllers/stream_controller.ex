@@ -2,7 +2,7 @@ defmodule Streamr.StreamController do
   use Streamr.Web, :controller
   alias Streamr.{Stream, Repo, StreamData, StreamUploader}
 
-  plug Streamr.Authenticate when action in [:create, :add_line, :subscribed]
+  plug Streamr.Authenticate when action in [:create, :add_line, :subscribed, :end_stream, :publish]
 
   def index(conn, params) do
     streams = params
@@ -114,6 +114,23 @@ defmodule Streamr.StreamController do
         conn
         |> put_status(422)
         |> render("errors.json-api", data: changeset)
+    end
+  end
+
+  def publish(conn, params) do
+    stream = get_stream(params)
+    conn = authorize!(conn, stream)
+    changeset = Stream.publish_changeset(stream)
+
+    case Repo.update(changeset) do
+      {:ok, stream} ->
+        conn
+        |> render("show.json-api", data: with_associations(stream))
+
+      {:error, errors} ->
+        conn
+        |> put_status(422)
+        |> render("errors.json-api", data: errors)
     end
   end
 

@@ -32,11 +32,15 @@ defmodule Streamr.Stream do
   end
 
   def duration_changeset(model) do
-    published_at = Timex.now()
-    duration = Timex.to_unix(published_at) - Timex.to_unix(model.inserted_at)
+    duration = Timex.to_unix(Timex.now()) - Timex.to_unix(model.inserted_at)
 
     model
-    |> cast(%{duration: duration, published_at: published_at}, [:duration, :published_at])
+    |> cast(%{duration: duration}, [:duration])
+  end
+
+  def publish_changeset(stream) do
+    stream
+    |> cast(%{published_at: Timex.now()}, [:published_at])
   end
 
   def with_associations(query) do
