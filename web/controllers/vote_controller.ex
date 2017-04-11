@@ -1,9 +1,10 @@
 defmodule Streamr.VoteController do
   use Streamr.Web, :controller
 
-  alias Streamr.{Vote, VoteManager}
+  alias Streamr.{Vote, VoteManager, Authenticate}
+  alias Plug.Conn
 
-  plug Streamr.Authenticate
+  plug Authenticate
   plug :halt_if_voted when action in [:create]
   plug :halt_unless_voted when action in [:delete]
 
@@ -39,7 +40,7 @@ defmodule Streamr.VoteController do
     vote = conn |> get_vote() |> Repo.preload([:stream, :comment])
 
     if vote do
-      Plug.Conn.assign(conn, :vote, vote)
+      Conn.assign(conn, :vote, vote)
     else
       conn |> send_resp(204, "") |> halt()
     end

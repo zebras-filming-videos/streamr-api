@@ -1,6 +1,10 @@
 defmodule Streamr.UserController do
   use Streamr.Web, :controller
-  alias Streamr.{User, RefreshToken, Repo, Mailer, Email, UserSubscription}
+
+  alias Guardian.Plug
+  alias Streamr.{
+    User, RefreshToken, Repo, Mailer, Email, UserSubscription, UploadSupervisor, InitialCreator
+  }
 
   plug Streamr.Authenticate
     when action in [:me, :my_subscribers, :my_subscriptions, :subscribe, :unsubscribe]
@@ -34,7 +38,7 @@ defmodule Streamr.UserController do
     case User.find_and_confirm_password(email, password) do
       {:ok, user} ->
         {new_conn, jwt} = generate_access_token(conn, user)
-        {:ok, refresh_token} = Streamr.RefreshToken.create_for_user(user)
+        {:ok, refresh_token} = RefreshToken.create_for_user(user)
 
         new_conn
         |> render("refresh_token.json", access_token: jwt, refresh_token: refresh_token)
@@ -65,7 +69,7 @@ defmodule Streamr.UserController do
   end
 
   def me(conn, _assigns) do
-    render(conn, "show.json-api", data: Guardian.Plug.current_resource(conn))
+    render(conn, "show.json-api", data: Plug.current_resource(conn))
   end
 
   def my_subscriptions(conn, _assigns) do
@@ -106,8 +110,8 @@ defmodule Streamr.UserController do
   end
 
   def register_new_user(user) do
-    Task.Supervisor.start_child Streamr.UploadSupervisor, fn ->
-      Streamr.InitialCreator.process(user)
+    Supervisor.start_child UploadSupervisor, fn ->
+      InitialCreator.process(user)
       send_welcome_email(user)
     end
   end
@@ -137,8 +141,8 @@ defmodule Streamr.UserController do
   end
 
   defp generate_access_token(conn, user) do
-    new_conn = Guardian.Plug.api_sign_in(conn, user)
-    jwt = Guardian.Plug.current_token(new_conn)
+    new_conn = Plug.api_sign_in(conn, user)
+    jwt = Plug.current_token(new_conn)
 
     {new_conn, jwt}
   end
