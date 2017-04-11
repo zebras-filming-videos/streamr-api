@@ -10,6 +10,7 @@ defmodule Streamr.Stream do
     field :description, :string
     field :image, :string
     field :s3_key, :string
+    field :audio_s3_key, :string
     field :duration, :integer
     field :published_at, Timex.Ecto.DateTime
     field :votes_count, :integer, null: false, default: 0
@@ -25,7 +26,7 @@ defmodule Streamr.Stream do
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, [:title, :description])
+    |> cast(params, [:title, :description, :audio_s3_key])
     |> validate_required([:title])
   end
 
