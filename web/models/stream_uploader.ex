@@ -1,6 +1,5 @@
 defmodule Streamr.StreamUploader do
-  alias Streamr.Repo
-  alias Streamr.S3Service
+  alias Streamr.{Repo, S3Service}
 
   def process(stream) do
     stream
@@ -8,14 +7,13 @@ defmodule Streamr.StreamUploader do
     |> S3Service.upload_file(stream)
   end
 
-  @lint {Credo.Check.Warning.UnusedEnumOperation, false}
   defp write_to_file(stream) do
     file_name = file_name_for(stream)
     create_file(file_name)
 
     Postgrex.transaction(pg_link_pid(), fn(conn) ->
       conn
-      |> Postgrex.stream(io_query(conn, stream), [])s
+      |> Postgrex.stream(io_query(conn, stream), [])
       |> Enum.into(File.stream!(file_name), pg_result_to_io())
     end)
 

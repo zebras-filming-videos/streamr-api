@@ -20,7 +20,7 @@
         # You can give explicit globs or simply directories.
         # In the latter case `**/*.{ex,exs}` will be used.
         included: ["lib/", "src/", "web/", "apps/"],
-        excluded: [~r"/_build/", ~r"/deps/"]
+        excluded: [~r"/_build/", ~r"/deps/", "web/web.ex"]
       },
       #
       # If you create your own checks, you must specify the source files for
@@ -76,7 +76,7 @@
         {Credo.Check.Readability.LargeNumbers},
         {Credo.Check.Readability.MaxLineLength, priority: :low, max_length: 80},
         {Credo.Check.Readability.ModuleAttributeNames},
-        {Credo.Check.Readability.ModuleDoc},
+        {Credo.Check.Readability.ModuleDoc, false},
         {Credo.Check.Readability.ModuleNames},
         {Credo.Check.Readability.ParenthesesOnZeroArityDefs},
         {Credo.Check.Readability.ParenthesesInCondition},
@@ -106,7 +106,7 @@
         {Credo.Check.Warning.IoInspect},
         {Credo.Check.Warning.OperationOnSameValues},
         {Credo.Check.Warning.OperationWithConstantResult},
-        {Credo.Check.Warning.UnusedEnumOperation},
+        {Credo.Check.Warning.UnusedEnumOperation, false},
         {Credo.Check.Warning.UnusedFileOperation},
         {Credo.Check.Warning.UnusedKeywordOperation},
         {Credo.Check.Warning.UnusedListOperation},
