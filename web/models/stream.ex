@@ -24,10 +24,11 @@ defmodule Streamr.Stream do
     timestamps()
   end
 
-  def changeset(model, params \\ %{}) do
-    model
+  def changeset(stream, params \\ %{}) do
+    stream
     |> cast(params, [:title, :description, :audio_s3_key])
     |> validate_required([:title])
+    |> validate_audio_belongs_to_stream(stream)
   end
 
   def duration_changeset(model) do
@@ -72,5 +73,25 @@ defmodule Streamr.Stream do
     |> cast(params, [:s3_key])
     |> validate_required([:s3_key])
     |> Repo.update
+  end
+
+  defp validate_audio_belongs_to_stream(%{changes: %{audio_s3_key: key}} = changeset, stream) do
+    if valid_audio_s3_key?(key, stream) do
+      changeset
+    else
+      invalid_audio_key_error(changeset)
+    end
+  end
+
+  defp validate_audio_belongs_to_stream(changeset, _stream) do
+    changeset
+  end
+
+  defp valid_audio_s3_key?(audio_s3_key, stream) do
+    audio_s3_key && String.starts_with?(audio_s3_key, "streams/#{stream.id}")
+  end
+
+  defp invalid_audio_key_error(changeset) do
+    add_error(changeset, :audio_s3_key, "invalid audio_s3_key")
   end
 end
