@@ -4,8 +4,8 @@ defmodule Streamr.StreamView do
   use Streamr.Sluggifier, attribute: :title
 
   attributes [
-    :title, :description, :image, :data_url, :audio_data_url, :duration, :published_at, :votes_count,
-    :current_user_voted
+    :title, :description, :image, :data_url, :audio_data_url, :duration, :published_at,
+    :votes_count, :current_user_voted
   ]
 
   has_one :user, serializer: Streamr.UserView, include: true
