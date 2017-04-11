@@ -9,6 +9,9 @@ To start your Phoenix app:
   * Connect to your database with `$ bin/db`
   * Run tests and lint code with `$ bin/test`
 
+_Note: `bin/server` and `bin/test` can be run with the `-i` flag to allow for an
+interactive mode_
+
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 ## Endpoints
