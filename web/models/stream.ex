@@ -34,19 +34,19 @@ defmodule Streamr.Stream do
 
   def search(query, nil), do: query
   def search(query, search) do
-    from u in query,
-    where: fragment("similarity(?, ?) > ?", u.title, ^search, @title_similarity_threshold),
+    from stream in query,
+    where: fragment("similarity(?, ?) > ?", stream.title, ^search, @title_similarity_threshold),
     or_where: fragment(
       "similarity(?, ?) > ?",
-      u.description,
+      stream.description,
       ^search,
       @description_similarity_threshold
     )
   end
 
   def ordered_by_search(query, search) do
-    from u in query,
-    order_by: fragment("similarity(?, ?) DESC", u.title, ^search)
+    from stream in query,
+    order_by: fragment("similarity(?, ?) DESC", stream.title, ^search)
   end
 
   def changeset(stream, params \\ %{}) do
