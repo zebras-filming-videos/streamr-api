@@ -11,6 +11,9 @@ mix deps.get
 # Ensure db is up to date
 MIX_ENV=test mix ecto.migrate
 
+# Lint your files
+mix dogma
+
 source .env 
 if [ "$1" == "-i" ] ; then
   iex -S mix test
