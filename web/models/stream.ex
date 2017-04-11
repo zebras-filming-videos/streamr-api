@@ -5,6 +5,8 @@ defmodule Streamr.Stream do
   alias Streamr.{Repo, UserSubscription}
   import Ecto.Query
 
+  @similarity_limit 0.2
+
   schema "streams" do
     field :title, :string, null: false
     field :description, :string
@@ -27,6 +29,25 @@ defmodule Streamr.Stream do
   def published(query) do
     from stream in query,
     where: not is_nil(stream.published_at)
+  end
+
+  def search(query, nil), do: query
+  def search(query, search) do
+    from u in query,
+    where: fragment("similarity(?, ?) > ?", u.title, ^search, @similarity_limit),
+    or_where: ilike(u.title, ^"%#{search}%"),
+    or_where: ilike(u.description, ^"%#{search}%")
+  end
+
+  def ordered_by_search(query, search) do
+    from u in query,
+    order_by: fragment(
+      "similarity(?, ?) DESC, similarity(?, ?) DESC",
+      u.title,
+      ^search,
+      u.description,
+      ^search
+    )
   end
 
   def changeset(stream, params \\ %{}) do
