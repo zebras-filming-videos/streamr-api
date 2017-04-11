@@ -1,7 +1,7 @@
 defmodule Streamr.UserView do
   use Streamr.Web, :view
   use JaSerializer.PhoenixView
-  alias Streamr.{Repo, UserSubscription}
+  alias Streamr.{Repo, UserSubscription, UrlQualifier}
 
   attributes [:name, :email, :current_user_subscribed, :image_url]
 
@@ -15,7 +15,7 @@ defmodule Streamr.UserView do
   end
 
   def image_url(user, _conn) do
-    Streamr.UrlQualifier.cdn_url_for(user.image_s3_key)
+    UrlQualifier.cdn_url_for(user.image_s3_key)
   end
 
   def render("access_token.json", %{access_token: access_token}) do

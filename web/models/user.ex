@@ -1,6 +1,7 @@
 defmodule Streamr.User do
   use Streamr.Web, :model
-  alias Streamr.{User, UserSubscription}
+  alias Streamr.{User, UserSubscription, Stream, Comment, Vote, Repo}
+  alias Comeonin.Bcrypt
 
   schema "users" do
     field :name, :string
@@ -9,16 +10,16 @@ defmodule Streamr.User do
     field :password_hash, :string
     field :image_s3_key, :string
 
-    has_many :streams, Streamr.Stream
-    has_many :comment, Streamr.Comment, on_delete: :delete_all
+    has_many :streams, Stream
+    has_many :comment, Comment, on_delete: :delete_all
 
-    has_many :_subscribers, Streamr.UserSubscription, foreign_key: :subscription_id
+    has_many :_subscribers, UserSubscription, foreign_key: :subscription_id
     has_many :subscribers, through: [:_subscribers, :subscriber]
 
-    has_many :_subscriptions, Streamr.UserSubscription, foreign_key: :subscriber_id
+    has_many :_subscriptions, UserSubscription, foreign_key: :subscriber_id
     has_many :subscriptions, through: [:_subscriptions, :subscription]
 
-    has_many :votes, Streamr.Vote, on_delete: :delete_all
+    has_many :votes, Vote, on_delete: :delete_all
 
     timestamps()
   end
@@ -46,12 +47,12 @@ defmodule Streamr.User do
   end
 
   def find_and_confirm_password(email, password) do
-    user = Streamr.Repo.get_by(Streamr.User, email: email)
+    user = Repo.get_by(User, email: email)
 
-    if user && Comeonin.Bcrypt.checkpw(password, user.password_hash) do
+    if user && Bcrypt.checkpw(password, user.password_hash) do
       {:ok, user}
     else
-      Comeonin.Bcrypt.dummy_checkpw()
+      Bcrypt.dummy_checkpw()
       {:error, nil}
     end
   end
@@ -59,7 +60,7 @@ defmodule Streamr.User do
   defp put_pass_hash(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
-        put_change(changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(pass))
+        put_change(changeset, :password_hash, Bcrypt.hashpwsalt(pass))
       _ ->
         changeset
     end
@@ -67,7 +68,7 @@ defmodule Streamr.User do
 
   defp validate_email_uniqueness(changeset) do
     validate_change changeset, :email, fn _field, email ->
-      user = Streamr.Repo.get_by(Streamr.User, email: email || "")
+      user = Repo.get_by(User, email: email || "")
 
       if is_nil(user) do
         []
