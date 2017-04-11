@@ -19,8 +19,8 @@ defmodule Streamr.StreamController do
     streams = conn.assigns.current_user
               |> Stream.subscribed()
               |> Stream.published()
-              |> Stream.with_associations()
               |> search_and_order(params)
+              |> Stream.with_associations()
               |> Repo.paginate(params)
 
     render(conn, "index.json-api", data: streams)
@@ -157,7 +157,7 @@ defmodule Streamr.StreamController do
     Repo.get!(Stream, Map.get(params, "stream_id"))
   end
 
-  defp search_and_order(query, %{"search" => search} = params) do
+  defp search_and_order(query, %{"search" => search}) do
     query |> Stream.search(search) |> Stream.ordered_by_search(search)
   end
 
