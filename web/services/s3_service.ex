@@ -21,7 +21,7 @@ defmodule Streamr.S3Service do
   defp hashed_contents(filepath) do
     filepath
     |> File.stream!()
-    |> Enum.reduce(:crypto.hash_init(:sha256), fn(line, acc) -> :crypto.hash_update(acc,line) end)
+    |> Enum.reduce(:crypto.hash_init(:sha256), fn(line, acc) -> :crypto.hash_update(acc, line) end)
     |> :crypto.hash_final
     |> Base.encode16
   end

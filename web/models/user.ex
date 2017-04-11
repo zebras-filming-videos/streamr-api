@@ -48,12 +48,11 @@ defmodule Streamr.User do
   def find_and_confirm_password(email, password) do
     user = Streamr.Repo.get_by(Streamr.User, email: email)
 
-    cond do
-      user && Comeonin.Bcrypt.checkpw(password, user.password_hash) ->
-        {:ok, user}
-      true ->
-        Comeonin.Bcrypt.dummy_checkpw()
-        {:error, nil}
+    if user && Comeonin.Bcrypt.checkpw(password, user.password_hash) do
+      {:ok, user}
+    else
+      Comeonin.Bcrypt.dummy_checkpw()
+      {:error, nil}
     end
   end
 
