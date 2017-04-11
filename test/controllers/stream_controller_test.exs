@@ -12,9 +12,9 @@ defmodule Streamr.StreamControllerTest do
 
       conn = get(build_conn(), "/api/v1/streams")
 
-      response_ids = conn |> json_response(200) |> ids_from_response()
+      response_ids = conn |> json_response(200) |> response_ids()
 
-      assert response_ids == ids_from_db(published_streams)
+      assert response_ids == model_ids(published_streams)
     end
   end
 
@@ -176,7 +176,7 @@ defmodule Streamr.StreamControllerTest do
       post_authorized(stream.user, "/api/v1/streams/#{stream.id}/publish")
       conn = get(build_conn(), "/api/v1/streams")
 
-      response_ids = conn |> json_response(200) |> ids_from_response()
+      response_ids = conn |> json_response(200) |> response_ids()
 
       assert Enum.member?(response_ids, stream.id)
     end

@@ -54,14 +54,14 @@ defmodule Streamr.ConnCase do
         |> get(endpoint, body)
       end
 
-      def ids_from_response(response) do
+      def response_ids(response) do
         response
         |> Map.get("data")
         |> Enum.map(fn(object) -> String.to_integer(object["id"]) end)
         |> Enum.sort()
       end
 
-      def ids_from_db(db_rows) do
+      def model_ids(db_rows) do
         db_rows
         |> Enum.map(fn(object) -> object.id end)
         |> Enum.sort()
