@@ -34,20 +34,12 @@ defmodule Streamr.Stream do
   def search(query, nil), do: query
   def search(query, search) do
     from u in query,
-    where: fragment("similarity(?, ?) > ?", u.title, ^search, @similarity_limit),
-    or_where: ilike(u.title, ^"%#{search}%"),
-    or_where: ilike(u.description, ^"%#{search}%")
+    where: fragment("similarity(?, ?) > ?", u.title, ^search, @similarity_limit)
   end
 
   def ordered_by_search(query, search) do
     from u in query,
-    order_by: fragment(
-      "similarity(?, ?) DESC, similarity(?, ?) DESC",
-      u.title,
-      ^search,
-      u.description,
-      ^search
-    )
+    order_by: fragment("similarity(?, ?) DESC", u.title, ^search)
   end
 
   def changeset(stream, params \\ %{}) do

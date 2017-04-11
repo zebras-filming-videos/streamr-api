@@ -18,6 +18,22 @@ defmodule Streamr.StreamControllerTest do
     end
   end
 
+  describe "GET /api/v1/streams?search=:search" do
+    test "it finds all streams that closely match the designated search" do
+      desired_streams = insert_list(3, :stream, title: "Foo bar baz")
+      _decoys = insert_list(2, :stream)
+
+      conn = get(build_conn(), "/api/v1/streams?search=bar%20foo")
+
+      response = json_response(conn, 200)["data"]
+
+      desired_ids = desired_streams |> Enum.map(&(&1.id)) |> Enum.sort
+      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
+
+      assert response_ids == desired_ids
+    end
+  end
+
   describe "GET /api/v1/topics/:topic_id/streams" do
     test "it returns streams belonging to the specified topic" do
       topic = insert(:topic)
