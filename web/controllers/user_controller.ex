@@ -73,13 +73,13 @@ defmodule Streamr.UserController do
   end
 
   def my_subscriptions(conn, _assigns) do
-    user = conn.assigns[:current_user] |> Repo.preload(:subscriptions)
+    user = conn.assigns.current_user |> Repo.preload(:subscriptions)
 
     render(conn, "index.json-api", data: user.subscriptions)
   end
 
   def my_subscribers(conn, _assigns) do
-    user = conn.assigns[:current_user] |> Repo.preload(:subscribers)
+    user = conn.assigns.current_user |> Repo.preload(:subscribers)
 
     render(conn, "index.json-api", data: user.subscribers)
   end
@@ -87,7 +87,7 @@ defmodule Streamr.UserController do
   def subscribe(conn, %{"user_id" => subscription_id}) do
     changeset = UserSubscription.new_subscription_changeset(
       %UserSubscription{},
-      %{subscription_id: subscription_id, subscriber_id: conn.assigns[:current_user].id}
+      %{subscription_id: subscription_id, subscriber_id: conn.assigns.current_user.id}
     )
 
     case Repo.insert(changeset) do
@@ -100,7 +100,7 @@ defmodule Streamr.UserController do
     subscription = Repo.get_by!(
       UserSubscription,
       subscription_id: subscription_id,
-      subscriber_id: conn.assigns[:current_user].id
+      subscriber_id: conn.assigns.current_user.id
     )
 
     case Repo.delete(subscription) do
@@ -136,7 +136,7 @@ defmodule Streamr.UserController do
     Repo.get_by(
       UserSubscription,
       subscription_id: conn.params["user_id"],
-      subscriber_id: conn.assigns[:current_user].id
+      subscriber_id: conn.assigns.current_user.id
     )
   end
 

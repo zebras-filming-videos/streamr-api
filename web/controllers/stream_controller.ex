@@ -16,7 +16,7 @@ defmodule Streamr.StreamController do
   end
 
   def subscribed(conn, params) do
-    streams = conn.assigns[:current_user]
+    streams = conn.assigns.current_user
               |> Stream.subscribed()
               |> Stream.published()
               |> Stream.with_associations()
