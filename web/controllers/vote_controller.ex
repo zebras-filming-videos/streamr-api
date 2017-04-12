@@ -19,7 +19,7 @@ defmodule Streamr.VoteController do
   end
 
   def delete(conn, _params) do
-    case VoteManager.delete(conn.assigns.current_user, conn.assigns.vote) do
+    case VoteManager.delete(conn.assigns.vote) do
       {:ok, _} -> send_resp(conn, 204, "")
       {:error, _, errors, _} ->
         conn
