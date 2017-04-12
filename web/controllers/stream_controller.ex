@@ -165,8 +165,8 @@ defmodule Streamr.StreamController do
     Stream.ordered(query)
   end
 
-  defp update_changeset(stream, %{"thumbnail_data" => thumbnail_data} = params) do
-    image_s3_key = PreviewUploader.upload(stream, thumbnail_data)
+  defp update_changeset(stream, %{"preview_data" => preview_data} = params) do
+    image_s3_key = PreviewUploader.upload(stream, preview_data)
 
     stream
     |> Stream.image_changeset(image_s3_key)
