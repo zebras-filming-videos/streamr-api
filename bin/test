@@ -12,7 +12,7 @@ mix deps.get
 MIX_ENV=test mix ecto.migrate
 
 # Lint your files
-mix dogma
+mix credo --strict
 
 source .env 
 if [ "$1" == "-i" ] ; then
