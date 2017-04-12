@@ -25,12 +25,9 @@ defmodule Streamr.StreamControllerTest do
 
       conn = get(build_conn(), "/api/v1/streams?search=bar%20foo")
 
-      response = json_response(conn, 200)["data"]
+      response_ids = conn |> json_response(200) |> response_ids()
 
-      desired_ids = desired_streams |> Enum.map(&(&1.id)) |> Enum.sort
-      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
-
-      assert response_ids == desired_ids
+      assert response_ids == model_ids(desired_streams)
     end
   end
 
@@ -42,12 +39,10 @@ defmodule Streamr.StreamControllerTest do
       _decoys = insert_list(2, :stream)
 
       conn = get(build_conn(), "/api/v1/topics/#{topic.id}/streams")
-      response = json_response(conn, 200)["data"]
 
-      stream_ids_in_topic = streams_in_topic |> Enum.map(&(&1.id)) |> Enum.sort
-      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
+      response_ids = conn |> json_response(200) |> response_ids()
 
-      assert stream_ids_in_topic == response_ids
+      assert model_ids(streams_in_topic) == response_ids
     end
   end
 
@@ -62,15 +57,13 @@ defmodule Streamr.StreamControllerTest do
       {:ok, me: me, subscribed_users_streams: streams}
     end
 
-    test "it returns streams from my subscribers", params do
-      conn = get_authorized(params.me, "/api/v1/streams/subscribed")
+    test "it returns streams from my subscribers",
+    %{me: me, subscribed_users_streams: subscribed_users_streams} do
+      conn = get_authorized(me, "/api/v1/streams/subscribed")
 
-      response = json_response(conn, 200)["data"]
+      response_ids = conn |> json_response(200) |> response_ids()
 
-      subscribed_stream_ids = params.subscribed_users_streams |> Enum.map(&(&1.id)) |> Enum.sort
-      response_ids = response |> Enum.map(&(String.to_integer(&1["id"]))) |> Enum.sort
-
-      assert subscribed_stream_ids == response_ids
+      assert model_ids(subscribed_users_streams) == response_ids
     end
 
     test "it returns a 401 when the user is not logged in" do
