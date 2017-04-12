@@ -25,9 +25,9 @@ defmodule Streamr.User do
   end
 
   def subscriptions_for(user) do
-    from user in User,
-    join: user_subscription in UserSubscription, on: user_subscription.subscription_id == user.id,
-    where: user_subscription.subscriber_id == ^user.id
+    from u in User,
+    join: sub in UserSubscription, on: sub.subscription_id == u.id,
+    where: sub.subscriber_id == ^user.id
   end
 
   def subscribed_to(user) do
