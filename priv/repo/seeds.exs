@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Streamr.{Repo, Topic, Stream, Color, StreamData, Comment, Vote}
+import IEx;
 
 defmodule SeedHelpers do
   def aws_url(path) do
@@ -36,31 +37,38 @@ Repo.insert! %Topic{name: "Physics"}
 Repo.insert! %Topic{name: "US History"}
 Repo.insert! %Topic{name: "World History"}
 
-Repo.delete_all Vote
-Repo.delete_all Comment
-Repo.delete_all StreamData
-Repo.delete_all Stream
+# Repo.delete_all Vote
+# Repo.delete_all Comment
+# Repo.delete_all StreamData
+# Repo.delete_all Stream
 
 normal_colors = %{
-  red: "#e06c75",
-  blue: "#61afef",
-  green: "#98c379",
-  orange: "#d19a66",
-  purple: "#c678dd",
   white: "#abb2bf",
+  red: "#e06c75",
+  orange: "#d19a66",
+  green: "#98c379",
+  blue: "#61afef",
+  purple: "#c678dd",
+}
+
+deuteranopia_colors = %{
+  white: "#ffffff",
+  # red: "#9c4bf9",
+  red: "#adedbd",
+  orange: "#d19a66",
+  green: "#9b9fa2",
+  blue: "#61afef",
+  purple: "#b940dd",
 }
 
 protanopia_colors = %{
-  # red: "#7c08ff",
-  red: "#9c4bf9",
-  blue: "#61afef",
-  green: "#9b9fa2",
-  orange: "#d19a66",
-  purple: "#b940dd",
   white: "#ffffff",
+  red: "#9c4bf9",
+  orange: "#d19a66",
+  green: "#9b9fa2",
+  blue: "#61afef",
+  purple: "#b940dd",
 }
-
-deuteranopia_colors = %{}
 
 tritanopia_colors = %{}
 
@@ -73,18 +81,24 @@ color_orders = [
   {:purple, 6}
 ]
 
-Enum.each color_orders, fn {color, order} ->
+Enum.each color_orders, fn {color_atom, order} ->
   changes = %{
-    normal: normal_colors[color],
-    protanopia: protanopia_colors[color],
-    deuteranopia: deuteranopia_colors[color],
-    tritanopia: tritanopia_colors[color],
+    normal: normal_colors[color_atom],
+    protanopia: protanopia_colors[color_atom],
+    deuteranopia: deuteranopia_colors[color_atom],
+    tritanopia: tritanopia_colors[color_atom],
     order: order
   }
 
-  Color
-  |> Repo.get_by(order: order)
-  |> Kernel.||(%Color{})
-  |> Color.changeset(changes)
-  |> Repo.insert_or_update()
+  if color = Repo.get_by(Color, order: order) do
+    if order == 2, do: IEx.pry
+
+    color
+    |> Color.changeset(changes)
+    |> Repo.update!()
+  else
+    %Color{}
+    |> Color.changeset(changes)
+    |> Repo.insert!()
+  end
 end
