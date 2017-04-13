@@ -11,13 +11,6 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Streamr.{Repo, Topic, Stream, Color, StreamData, Comment, Vote}
-import IEx;
-
-defmodule SeedHelpers do
-  def aws_url(path) do
-    "https://s3-us-west-2.amazonaws.com/streamr-staging/Seeds/" <> path
-  end
-end
 
 Repo.delete_all Topic
 Repo.insert! %Topic{name: "Art History"}
@@ -36,11 +29,6 @@ Repo.insert! %Topic{name: "Organic Chemistry"}
 Repo.insert! %Topic{name: "Physics"}
 Repo.insert! %Topic{name: "US History"}
 Repo.insert! %Topic{name: "World History"}
-
-# Repo.delete_all Vote
-# Repo.delete_all Comment
-# Repo.delete_all StreamData
-# Repo.delete_all Stream
 
 normal_colors = %{
   white: "#abb2bf",
@@ -97,8 +85,6 @@ Enum.each color_orders, fn {color_atom, order} ->
   }
 
   if color = Repo.get_by(Color, order: order) do
-    if order == 2, do: IEx.pry
-
     color
     |> Color.changeset(changes)
     |> Repo.update!()
