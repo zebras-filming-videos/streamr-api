@@ -51,7 +51,8 @@ normal_colors = %{
 }
 
 protanopia_colors = %{
-  red: "#7c08ff",
+  # red: "#7c08ff",
+  red: "#9c4bf9",
   blue: "#61afef",
   green: "#9b9fa2",
   orange: "#d19a66",
@@ -73,11 +74,17 @@ color_orders = [
 ]
 
 Enum.each color_orders, fn {color, order} ->
-  Repo.insert! %Color{
+  changes = %{
     normal: normal_colors[color],
     protanopia: protanopia_colors[color],
     deuteranopia: deuteranopia_colors[color],
     tritanopia: tritanopia_colors[color],
     order: order
   }
+
+  Color
+  |> Repo.get_by(order: order)
+  |> Kernel.||(%Color{})
+  |> Color.changeset(changes)
+  |> Repo.insert_or_update()
 end
