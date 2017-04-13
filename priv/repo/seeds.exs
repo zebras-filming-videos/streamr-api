@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias Streamr.{Repo, Topic, Stream, Color, StreamData, Comment, Vote}
+alias Streamr.{Repo, Topic, Color}
 
 Repo.delete_all Topic
 Repo.insert! %Topic{name: "Art History"}
