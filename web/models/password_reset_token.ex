@@ -6,7 +6,7 @@ defmodule Streamr.PasswordResetToken do
   @secret_key_base Application.get_env(:streamr, :secret_key_base)
 
   def generate(user) do
-    %{user_id: user.id, "current_pw_hash": user.password_hash}
+    %{user_id: user.id, current_pw_hash: user.password_hash}
     |> token()
     |> with_signer(hs256(@secret_key_base))
     |> sign()
