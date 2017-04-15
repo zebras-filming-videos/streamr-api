@@ -21,10 +21,10 @@ defmodule Streamr.ProfilePictureUploader do
       "-filter", "point",
       "-distort", "SRT",
       "0", "+repage",
-      "#{filepath}.png"
+      "#{filepath}.jpg"
     ])
 
-    "#{filepath}.png"
+    "#{filepath}.jpg"
   end
 
   defp filepath_for(user) do
