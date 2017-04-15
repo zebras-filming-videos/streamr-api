@@ -5,10 +5,9 @@ defmodule Streamr.SVGGenerator do
 
   def generate(stream) do
     filepath = filepath_for(stream)
-    color_map = Repo.all(from c in Color, select: {c.id, c.normal}) |> Enum.into(%{})
 
     create_file(stream, filepath)
-    create_svg(stream, filepath, color_map)
+    create_svg(stream, filepath)
     add_footer(filepath)
     convert_to_png(filepath)
   end
@@ -26,7 +25,9 @@ defmodule Streamr.SVGGenerator do
     File.write!(filepath, svg_header())
   end
 
-  defp create_svg(stream, filepath, color_map) do
+  defp create_svg(stream, filepath) do
+    color_map = generate_color_map()
+
     Postgrex.transaction(pg_link_pid(), fn(conn) ->
       conn
       |> Postgrex.stream(io_query(conn, stream), [])
@@ -58,7 +59,7 @@ defmodule Streamr.SVGGenerator do
     decoded_row = Poison.decode!(row)
 
     color = Map.get(color_map, String.to_integer(decoded_row["color_id"]))
-    width = Map.get(decoded_row, "thickness")
+    width = Map.get(decoded_row, "thickness") + 2
 
     path = decoded_row
     |> Map.get("points")
@@ -99,5 +100,9 @@ defmodule Streamr.SVGGenerator do
 
   defp filepath_for(stream) do
     "uploads/stream_preview_#{stream.id}.svg"
+  end
+
+  defp generate_color_map do
+    Repo.all(from c in Color, select: {c.id, c.normal}) |> Enum.into(%{})
   end
 end
