@@ -15,7 +15,11 @@ defmodule Streamr.SVGGenerator do
   defp convert_to_png(filepath) do
     new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
-    System.cmd("convert", ["-size", "1920x1080", filepath, new_filepath])
+    System.cmd("convert", [
+      "-size", "1920x1080",
+      "-interlace", "plane",
+      filepath, new_filepath
+    ])
 
     new_filepath
   end
