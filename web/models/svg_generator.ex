@@ -1,12 +1,12 @@
 defmodule Streamr.SVGGenerator do
   import Ecto.Query
 
-  alias Streamr.{Repo, StreamData, Color}
+  alias Streamr.{Repo, Color}
 
   def generate(stream) do
     filepath = filepath_for(stream)
 
-    create_file(stream, filepath)
+    create_file(filepath)
     create_svg(stream, filepath)
     add_footer(filepath)
     convert_to_png(filepath)
@@ -20,7 +20,7 @@ defmodule Streamr.SVGGenerator do
     new_filepath
   end
 
-  defp create_file(stream, filepath) do
+  defp create_file(filepath) do
     File.touch(filepath)
     File.write!(filepath, svg_header())
   end
@@ -43,10 +43,6 @@ defmodule Streamr.SVGGenerator do
 
   defp repo_config do
     Application.get_env(:streamr, Repo)
-  end
-
-  defp create_file(name) do
-    File.touch(name)
   end
 
   defp pg_result_to_io(color_map) do
@@ -84,10 +80,10 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp svg_header do
-    ~s(
+    """
       <svg viewBox="0 0 1920 1080"><g fill="none">
         <rect x="0" y="0" width="1920" height="1080" fill="#000000"></rect>
-    )
+    """
   end
 
   defp svg_footer do
@@ -103,6 +99,7 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp generate_color_map do
-    Repo.all(from c in Color, select: {c.id, c.normal}) |> Enum.into(%{})
+    Repo.all(from c in Color, select: {c.id, c.normal})
+    |> Enum.into(%{})
   end
 end
