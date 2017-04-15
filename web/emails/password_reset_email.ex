@@ -1,7 +1,7 @@
 defmodule Streamr.PasswordResetEmail do
   use Phoenix.Swoosh, view: Streamr.Email.PasswordResetView, layout: {Streamr.LayoutView, :email}
 
-  alias Streamr.{Repo, User, PasswordResetToken}
+  alias Streamr.{PasswordResetToken}
 
   @frontend_password_reset_url System.get_env("FRONTEND_PASSWORD_RESET_URL")
 

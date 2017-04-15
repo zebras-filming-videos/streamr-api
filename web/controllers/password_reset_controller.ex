@@ -15,11 +15,11 @@ defmodule Streamr.PasswordResetController do
     send_resp(conn, 204, "")
   end
 
-  def update_password(conn, %{"token" => token, "password" => password}) do
+  def update_password(conn, %{"password" => password}) do
     changeset = User.registration_changeset(conn.assigns.current_user, %{password: password})
 
     case Repo.update(changeset) do
-      {:ok, user} -> send_resp(conn, 204, "")
+      {:ok, _user} -> send_resp(conn, 204, "")
       {:error, errors} -> conn |> put_status(422) |> render("errors.json-api", data: errors)
     end
   end
@@ -27,7 +27,7 @@ defmodule Streamr.PasswordResetController do
   defp verify_token(%{params: %{"token" => token}} = conn, _) do
     case PasswordResetToken.verify(token) do
       {:ok, user} -> Conn.assign(conn, :current_user, user)
-      {:error, error} -> conn |> put_status(401) |> render("invalid_token.json") |> halt()
+      {:error, _error} -> conn |> put_status(401) |> render("invalid_token.json") |> halt()
     end
   end
 end
