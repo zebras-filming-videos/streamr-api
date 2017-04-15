@@ -171,7 +171,7 @@ defmodule Streamr.UserController do
   end
 
   defp password_changeset(changeset, params) do
-    if Map.has_key?(params, "password") do
+    if Map.get(params, "password") do
       User.registration_changeset(changeset, params)
     else
       changeset
@@ -179,7 +179,7 @@ defmodule Streamr.UserController do
   end
 
   defp image_changeset(changeset, user, params) do
-    if Map.has_key?(params, "image") do
+    if Map.get(params, "image") do
       params["image"]
       |> ProfilePictureUploader.upload(user)
       |> User.image_key_changeset(user)
