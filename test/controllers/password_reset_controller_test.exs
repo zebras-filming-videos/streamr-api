@@ -2,8 +2,9 @@ defmodule Streamr.PasswordResetControllerTest do
   use Streamr.ConnCase
 
   import Streamr.Factory
+  import Swoosh.TestAssertions
 
-  alias Streamr.{PasswordResetToken, User, Repo, Ecto}
+  alias Streamr.{PasswordResetToken, User, Repo, PasswordResetEmail}
   alias Comeonin.Bcrypt
 
   describe "POST /api/v1/password_reset" do
@@ -13,6 +14,7 @@ defmodule Streamr.PasswordResetControllerTest do
       conn = post(build_conn(), "/api/v1/password_reset", %{email: user.email})
 
       assert conn.status == 204
+      assert_email_sent PasswordResetEmail.reset_password(user)
     end
 
     test "it returns a 404 when the user does not exist" do
