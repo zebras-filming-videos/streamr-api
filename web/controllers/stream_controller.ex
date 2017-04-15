@@ -102,7 +102,7 @@ defmodule Streamr.StreamController do
   def end_stream(conn, params) do
     stream = get_stream(params)
     conn = authorize!(conn, stream)
-    changeset = stream_end_changeset(stream, params)
+    changeset = stream_end_changeset(stream)
 
     case Repo.update(changeset) do
       {:ok, stream} ->
@@ -165,10 +165,11 @@ defmodule Streamr.StreamController do
     Stream.ordered(query)
   end
 
-  defp stream_end_changeset(stream, params) do
-    stream
-    |> SVGUploader.upload()
-    |> Stream.stream_end_changeset(stream)
+  defp stream_end_changeset(stream) do
+    duration = Timex.to_unix(Timex.now()) - Timex.to_unix(stream.inserted_at)
+    image_s3_key = SVGUploader.upload(stream)
+
+    Stream.stream_end_changeset(stream, %{duration: duration, image_s3_key: image_s3_key})
   end
 
   defp streams_by_parent(%{"user_id" => user_id}), do: Stream.for_user(user_id)
