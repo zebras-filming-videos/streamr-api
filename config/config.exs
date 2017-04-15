@@ -53,8 +53,6 @@ config :ex_aws, :s3,
 
 config :streamr, :secret_key_base, System.get_env("SECRET_KEY_BASE")
 
-config :streamr, :frontend_password_reset_url, System.get_env("FRONTEND_PASSWORD_RESET_URL")
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

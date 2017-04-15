@@ -3,7 +3,7 @@ defmodule Streamr.PasswordResetEmail do
 
   alias Streamr.{Repo, User, PasswordResetToken}
 
-  @frontend_password_reset_url Application.get_env(:streamr, :frontend_password_reset_url)
+  @frontend_password_reset_url System.get_env("FRONTEND_PASSWORD_RESET_URL")
 
   def reset_password(user) do
     token = PasswordResetToken.generate(user)
