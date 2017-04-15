@@ -2,6 +2,7 @@ defmodule Streamr.StreamControllerTest do
   use Streamr.ConnCase
 
   import Streamr.Factory
+  import Timex
 
   alias Streamr.{Repo, Stream, StreamData}
 
@@ -70,6 +71,12 @@ defmodule Streamr.StreamControllerTest do
       conn = get(build_conn(), "/api/v1/streams/subscribed")
 
       json_response(conn, 401)
+    end
+  end
+
+  describe "GET /streams/trending" do
+    setup do
+
     end
   end
 
@@ -287,5 +294,9 @@ defmodule Streamr.StreamControllerTest do
           assert Plug.Exception.status(exception) == 403
       end
     end
+  end
+
+  defp days_ago(offset) do
+    Timex.now() |> Timex.shift(days: -1 * offset)
   end
 end
