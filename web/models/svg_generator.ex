@@ -3,25 +3,35 @@ defmodule Streamr.SVGGenerator do
 
   alias Streamr.{Repo, StreamData, Color}
 
-  import IEx
-
   def generate(stream) do
-    filepath = "foo.svg"
-    create_file(stream, filepath)
+    filepath = filepath_for(stream)
     color_map = Repo.all(from c in Color, select: {c.id, c.normal}) |> Enum.into(%{})
 
-    Postgrex.transaction(pg_link_pid(), fn(conn) ->
-      conn
-      |> Postgrex.stream(io_query(conn, stream), [])
-      |> Enum.into(File.stream!(filepath, [:append]), pg_result_to_io(color_map))
-    end)
+    create_file(stream, filepath)
+    create_svg(stream, filepath, color_map)
+    add_footer(filepath)
+    convert_to_png(filepath)
+  end
 
-    File.write!(filepath, svg_footer(), [:append])
+  defp convert_to_png(filepath) do
+    new_filepath = String.replace_trailing(filepath, ".svg", ".png")
+
+    System.cmd("convert", ["-size", "1920x1080", filepath, new_filepath])
+
+    new_filepath
   end
 
   defp create_file(stream, filepath) do
     File.touch(filepath)
     File.write!(filepath, svg_header())
+  end
+
+  defp create_svg(stream, filepath, color_map) do
+    Postgrex.transaction(pg_link_pid(), fn(conn) ->
+      conn
+      |> Postgrex.stream(io_query(conn, stream), [])
+      |> Enum.into(File.stream!(filepath, [:append]), pg_result_to_io(color_map))
+    end)
   end
 
   defp pg_link_pid do
@@ -40,20 +50,22 @@ defmodule Streamr.SVGGenerator do
 
   defp pg_result_to_io(color_map) do
     fn %Postgrex.Result{rows: rows} ->
-      Enum.map rows, fn row ->
-        decoded_row = Poison.decode!(row)
-
-        color = Map.get(color_map, String.to_integer(decoded_row["color_id"]))
-        width = Map.get(decoded_row, "thickness")
-
-        path = decoded_row
-        |> Map.get("points")
-        |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
-        |> Enum.join("L")
-
-        ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}"></path>)
-      end
+      Enum.map(rows, &(generate_svg_path(&1, color_map)))
     end
+  end
+
+  defp generate_svg_path(row, color_map) do
+    decoded_row = Poison.decode!(row)
+
+    color = Map.get(color_map, String.to_integer(decoded_row["color_id"]))
+    width = Map.get(decoded_row, "thickness")
+
+    path = decoded_row
+    |> Map.get("points")
+    |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
+    |> Enum.join("L")
+
+    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}"></path>)
   end
 
   defp io_query(conn, stream) do
@@ -79,5 +91,13 @@ defmodule Streamr.SVGGenerator do
 
   defp svg_footer do
     "</g></svg>"
+  end
+
+  defp add_footer(filepath) do
+    File.write!(filepath, svg_footer(), [:append])
+  end
+
+  defp filepath_for(stream) do
+    "uploads/stream_preview_#{stream.id}.svg"
   end
 end
