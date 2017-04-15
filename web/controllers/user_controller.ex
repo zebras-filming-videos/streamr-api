@@ -73,7 +73,7 @@ defmodule Streamr.UserController do
   end
 
   def update(conn, %{"user" => user_params}) do
-    changeset = User.changeset(conn.assigns.current_user, user_params)
+    changeset = User.registration_changeset(conn.assigns.current_user, user_params)
 
     case Repo.update(changeset) do
       {:ok, user} -> render(conn, "show.json-api", data: user)
