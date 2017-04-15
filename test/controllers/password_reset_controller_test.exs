@@ -3,7 +3,7 @@ defmodule Streamr.PasswordResetControllerTest do
 
   import Streamr.Factory
 
-  alias Streamr.{PasswordResetToken, User, Repo}
+  alias Streamr.{PasswordResetToken, User, Repo, Ecto}
   alias Comeonin.Bcrypt
 
   describe "POST /api/v1/password_reset" do
@@ -16,9 +16,13 @@ defmodule Streamr.PasswordResetControllerTest do
     end
 
     test "it returns a 404 when the user does not exist" do
-      conn = post(build_conn(), "/api/v1/password_reset", %{email: "INVALID"})
+      try do
+        conn = post(build_conn(), "/api/v1/password_reset", %{email: "INVALID"})
 
-      assert conn.status == 404
+        assert conn.status == 404
+      rescue
+        exception -> assert Plug.Exception.status(exception) == 404
+      end
     end
   end
 
@@ -37,12 +41,12 @@ defmodule Streamr.PasswordResetControllerTest do
       token = PasswordResetToken.generate(user)
 
       # changing the user's password invalidates the token
-      user |> User.registration_changeset(%{password: "new"}) |> Repo.update()
+      {:ok, user} = user |> User.registration_changeset(%{password: "password123"}) |> Repo.update()
 
       conn = put(build_conn(), "/api/v1/password_reset", %{token: token, password: "foobity"})
 
-      assert conn.status == 204
-      assert Bcrypt.checkpw("new", user.password_hash)
+      assert conn.status == 401
+      assert Bcrypt.checkpw("password123", user.password_hash)
     end
   end
 end

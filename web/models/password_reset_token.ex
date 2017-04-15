@@ -13,7 +13,14 @@ defmodule Streamr.PasswordResetToken do
     |> get_compact()
   end
 
-  def decode(token_to_verify) do
+  def verify(token_to_verify) do
+    case decode_token(token_to_verify) do
+      {:ok, %{"user_id" => user_id}} -> {:ok, Repo.get(User, user_id)}
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  defp decode_token(token_to_verify) do
     token_to_verify
     |> token()
     |> with_validation(["user_id", "current_pw_hash"], validate_token_function())

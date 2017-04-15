@@ -5,8 +5,7 @@ defmodule Streamr.PasswordResetEmail do
 
   @frontend_password_reset_url Application.get_env(:streamr, :frontend_password_reset_url)
 
-  def reset_password(email) do
-    user = Repo.get_by!(User, email: email)
+  def reset_password(user) do
     token = PasswordResetToken.generate(user)
     url = @frontend_password_reset_url <> "?token=#{token}"
 
