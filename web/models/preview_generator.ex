@@ -10,7 +10,7 @@ defmodule Streamr.PreviewGenerator do
   def convert_to_png(filepath) do
     new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
-    System.cmd("convert", [filepath, new_filepath])
+    System.cmd("convert", ["-size", "1920x1080", filepath, new_filepath])
 
     new_filepath
   end
