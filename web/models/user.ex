@@ -39,7 +39,7 @@ defmodule Streamr.User do
 
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, [:name, :email])
+    |> cast(params, [:name, :email, :color_preference])
     |> validate_required([:name, :email])
     |> validate_length(:email, min: 1, max: 254)
     |> validate_email_uniqueness
