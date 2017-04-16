@@ -86,7 +86,7 @@ defmodule Streamr.SVGGenerator do
       where stream_id = #{stream.id}
         and line->>'type' = 'line'
         and #{undo_table_name}.undo is null
-      order by line->>'time' asc
+      order by (line->>'time')::int asc
     """
   end
 
