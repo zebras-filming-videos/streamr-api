@@ -79,6 +79,7 @@ defmodule Streamr.SVGGenerator do
       from stream_data
       left join lateral unnest(lines) as line on true
       where stream_id = #{stream.id}
+        and line->>'type' = 'line'
       order by line->>'time' asc
     """
   end
@@ -86,7 +87,7 @@ defmodule Streamr.SVGGenerator do
   defp svg_header do
     """
       <svg viewBox="0 0 1920 1080"><g fill="none">
-        <rect x="0" y="0" width="1920" height="1080" fill="#000000"></rect>
+        <rect x="0" y="0" width="1920" height="1080" fill="rgb(25,28,32)"></rect>
     """
   end
 
