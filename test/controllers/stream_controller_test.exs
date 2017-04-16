@@ -75,8 +75,11 @@ defmodule Streamr.StreamControllerTest do
   end
 
   describe "GET /streams/trending" do
-    setup do
-
+    test "it returns streams sorted by a function of their newness and vote count" do
+      _decoys = insert_list(3, :stream)
+      highest_rated = insert(:stream, published_at: days_ago(2))
+      lowest_rated = insert(:stream, published_at: days_ago(10))
+      middle_rated = insert(:stream, published_at: days_ago(5))
     end
   end
 
