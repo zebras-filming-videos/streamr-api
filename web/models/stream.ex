@@ -51,10 +51,11 @@ defmodule Streamr.Stream do
 
   def trending(query) do
     from stream in query,
+    where: stream.votes_count > 0,
     order_by: fragment("""
       (votes_count * log(votes_count + 1) +
         extract(epoch from published_at))
-      / 45000
+      / 45000 desc
     """)
   end
 

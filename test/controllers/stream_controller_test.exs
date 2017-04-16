@@ -2,9 +2,8 @@ defmodule Streamr.StreamControllerTest do
   use Streamr.ConnCase
 
   import Streamr.Factory
-  import Timex
 
-  alias Streamr.{Repo, Stream, StreamData}
+  alias Streamr.{Repo, Stream, StreamData, VoteManager}
 
   describe "GET /api/v1/streams" do
     test "it returns all streams" do
@@ -80,6 +79,16 @@ defmodule Streamr.StreamControllerTest do
       highest_rated = insert(:stream, published_at: days_ago(2))
       lowest_rated = insert(:stream, published_at: days_ago(10))
       middle_rated = insert(:stream, published_at: days_ago(5))
+      user = insert(:user)
+
+      Enum.each [highest_rated, lowest_rated, middle_rated], fn stream ->
+        VoteManager.create(user, %{"stream_id" => stream.id})
+      end
+
+      conn = get(build_conn(), "/api/v1/streams/trending")
+      response_ids = conn |> json_response(200) |> extract_ids_from_json()
+
+      assert response_ids == [highest_rated.id, middle_rated.id, lowest_rated.id]
     end
   end
 
