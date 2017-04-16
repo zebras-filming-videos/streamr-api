@@ -9,6 +9,7 @@ defmodule Streamr.User do
     field :password, :string, virtual: true
     field :password_hash, :string
     field :image_s3_key, :string
+    field :color_preference, Streamr.ColorPreferenceEnum
 
     has_many :streams, Stream
     has_many :comment, Comment, on_delete: :delete_all
