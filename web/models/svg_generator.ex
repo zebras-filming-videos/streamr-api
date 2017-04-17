@@ -37,9 +37,13 @@ defmodule Streamr.SVGGenerator do
     color_map = generate_color_map()
 
     Postgrex.transaction(pg_link_pid(), fn(conn) ->
+      query = io_query(conn, stream, undo_table_name)
+
       conn
-      |> Postgrex.stream(io_query(conn, stream, undo_table_name), [])
+      |> Postgrex.stream(query, [])
       |> Enum.into(File.stream!(filepath, [:append]), pg_result_to_io(color_map))
+
+      Postgrex.close!(conn, query)
     end)
   end
 

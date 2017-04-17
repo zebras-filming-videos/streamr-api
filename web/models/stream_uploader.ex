@@ -12,9 +12,13 @@ defmodule Streamr.StreamUploader do
     create_file(file_name)
 
     Postgrex.transaction(pg_link_pid(), fn(conn) ->
+      query = io_query(conn, stream)
+
       conn
-      |> Postgrex.stream(io_query(conn, stream), [])
+      |> Postgrex.stream(query, [])
       |> Enum.into(File.stream!(file_name), pg_result_to_io())
+
+      Postgrex.close!(conn, query)
     end)
 
     file_name
