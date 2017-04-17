@@ -29,7 +29,7 @@ defmodule Streamr.StreamUploader do
       where stream_id = #{stream.id}
       order by (line->>'time')::int asc
     """
-   end
+  end
 
   defp file_name_for(stream) do
     "uploads/stream_upload_data_#{stream.id}"
