@@ -50,13 +50,14 @@ defmodule Streamr.SVGGenerator do
   defp generate_svg_path(row, color_map) do
     color = Map.get(color_map, String.to_integer(row["color_id"]))
     width = Map.get(row, "thickness") + 2
+    suffix = line_cap(row)
 
     path = row
     |> Map.get("points")
     |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
     |> Enum.join("L")
 
-    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}Z"></path>)
+    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)
   end
 
   def stream_data_query(stream, undo_table_name) do
@@ -115,5 +116,9 @@ defmodule Streamr.SVGGenerator do
 
   defp drop_undos_table(undo_table_name) do
     SQL.query(Repo, "drop table #{undo_table_name}")
+  end
+
+  defp line_cap(row) do
+    if Enum.count(row["points"]) == 1, do: "Z"
   end
 end
