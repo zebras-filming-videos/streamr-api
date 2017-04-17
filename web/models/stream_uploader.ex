@@ -37,25 +37,11 @@ defmodule Streamr.StreamUploader do
     "uploads/stream_upload_data_#{stream.id}"
   end
 
-  defp pg_link_pid do
-    repo_config()
-    |> Postgrex.start_link
-    |> elem(1)
-  end
-
-  defp repo_config do
-    Application.get_env(:streamr, Repo)
-  end
-
   defp create_file(name) do
     File.touch(name)
   end
 
   defp pg_result_to_io do
     fn [line] -> Poison.encode!(line) <> "\n" end
-  end
-
-  defp io_query(conn, stream) do
-    Postgrex.prepare!(conn, "", "copy (#{stream_data_query(stream)}) to stdout")
   end
 end
