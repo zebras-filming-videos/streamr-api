@@ -1,5 +1,8 @@
 defmodule Streamr.StreamUploader do
   alias Streamr.{Repo, S3Service}
+  alias Ecto.Adapters.SQL
+
+  import IEx
 
   def process(stream) do
     stream
@@ -11,15 +14,10 @@ defmodule Streamr.StreamUploader do
     file_name = file_name_for(stream)
     create_file(file_name)
 
-    Postgrex.transaction(pg_link_pid(), fn(conn) ->
-      query = io_query(conn, stream)
-
-      conn
-      |> Postgrex.stream(query, [])
-      |> Enum.into(File.stream!(file_name), pg_result_to_io())
-
-      Postgrex.close!(conn, query)
-    end)
+    data = Repo
+    |> SQL.query!(stream_data_query(stream))
+    |> Map.get(:rows)
+    |> Enum.into(File.stream!(file_name), pg_result_to_io())
 
     file_name
   end
@@ -32,7 +30,7 @@ defmodule Streamr.StreamUploader do
       where stream_id = #{stream.id}
       order by (line->>'time')::int asc
     """
-  end
+   end
 
   defp file_name_for(stream) do
     "uploads/stream_upload_data_#{stream.id}"
@@ -53,7 +51,7 @@ defmodule Streamr.StreamUploader do
   end
 
   defp pg_result_to_io do
-    fn(%Postgrex.Result{rows: rows}) -> rows end
+    fn [line] -> Poison.encode!(line) <> "\n" end
   end
 
   defp io_query(conn, stream) do
