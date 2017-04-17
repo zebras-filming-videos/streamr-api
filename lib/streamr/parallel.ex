@@ -1,4 +1,4 @@
-defmodule Streamr.Parallel do
+defmodule Parallel do
   def pmap(collection, func) do
     collection
     |> Enum.map(&(Task.async(fn -> func.(&1) end)))

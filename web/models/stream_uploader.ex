@@ -1,8 +1,6 @@
 defmodule Streamr.StreamUploader do
-  alias Streamr.{Repo, S3Service, Parallel}
+  alias Streamr.{Repo, S3Service}
   alias Ecto.Adapters.SQL
-
-  import IEx
 
   def process(stream) do
     stream
@@ -14,10 +12,10 @@ defmodule Streamr.StreamUploader do
     file_name = file_name_for(stream)
     create_file(file_name)
 
-    data = Repo
+    Repo
     |> SQL.query!(stream_data_query(stream))
     |> Map.get(:rows)
-    |> Parallel.pmap(pg_result_to_io)
+    |> Parallel.pmap(pg_result_to_io())
     |> Enum.into(File.stream!(file_name))
 
     file_name
