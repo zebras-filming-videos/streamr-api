@@ -41,18 +41,18 @@ normal_colors = %{
 
 deuteranopia_colors = %{
   white: "#ffffff",
-  red: "#adedbd",
-  orange: "#d19a66",
-  green: "#9b9fa2",
-  blue: "#61afef",
-  purple: "#b940dd",
+  red: "#fb52e6",
+  orange: "#f0e442",
+  green: "#08dda3",
+  blue: "#6e92ff",
+  purple: "#4552f7",
 }
 
 protanopia_colors = %{
   white: "#ffffff",
-  red: "rgb(251, 82, 230)",
-  orange: "rgb(240, 228, 66)",
-  green: "rgb(8, 221, 163)",
+  red: "#fb52e6",
+  orange: "#f0e442",
+  green: "#08dda3",
   blue: "#61afef",
   purple: "#b940dd",
 }
