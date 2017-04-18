@@ -160,7 +160,7 @@ defmodule Streamr.UserController do
   defp send_welcome_email(user) do
     user
     |> Email.welcome
-    |> Mailer.deliver!
+    |> Mailer.deliver
   end
 
   defp update_changeset(user, params) do

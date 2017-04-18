@@ -12,23 +12,25 @@
 
 alias Streamr.{Repo, Topic, Color}
 
-# Repo.delete_all Topic
-# Repo.insert! %Topic{name: "Art History"}
-# Repo.insert! %Topic{name: "Biology"}
-# Repo.insert! %Topic{name: "Chemistry"}
-# Repo.insert! %Topic{name: "Computer Science"}
-# Repo.insert! %Topic{name: "Cosmology & Astronomy"}
-# Repo.insert! %Topic{name: "Electrical Engineering"}
-# Repo.insert! %Topic{name: "Entrepreneurship"}
-# Repo.insert! %Topic{name: "Grammar"}
-# Repo.insert! %Topic{name: "Health & Medicine"}
-# Repo.insert! %Topic{name: "Macroeconomics"}
-# Repo.insert! %Topic{name: "Microeconomics"}
-# Repo.insert! %Topic{name: "Music"}
-# Repo.insert! %Topic{name: "Organic Chemistry"}
-# Repo.insert! %Topic{name: "Physics"}
-# Repo.insert! %Topic{name: "US History"}
-# Repo.insert! %Topic{name: "World History"}
+if Repo.aggregate(Topic, :count, :id) == 0 do
+  Repo.delete_all Topic
+  Repo.insert! %Topic{name: "Art History"}
+  Repo.insert! %Topic{name: "Biology"}
+  Repo.insert! %Topic{name: "Chemistry"}
+  Repo.insert! %Topic{name: "Computer Science"}
+  Repo.insert! %Topic{name: "Cosmology & Astronomy"}
+  Repo.insert! %Topic{name: "Electrical Engineering"}
+  Repo.insert! %Topic{name: "Entrepreneurship"}
+  Repo.insert! %Topic{name: "Grammar"}
+  Repo.insert! %Topic{name: "Health & Medicine"}
+  Repo.insert! %Topic{name: "Macroeconomics"}
+  Repo.insert! %Topic{name: "Microeconomics"}
+  Repo.insert! %Topic{name: "Music"}
+  Repo.insert! %Topic{name: "Organic Chemistry"}
+  Repo.insert! %Topic{name: "Physics"}
+  Repo.insert! %Topic{name: "US History"}
+  Repo.insert! %Topic{name: "World History"}
+end
 
 normal_colors = %{
   white: "#d4d8e0",
