@@ -50,9 +50,9 @@ deuteranopia_colors = %{
 
 protanopia_colors = %{
   white: "#ffffff",
-  red: "#adedbd",
-  orange: "#d19a66",
-  green: "#9b9fa2",
+  red: "rgb(251, 82, 230)",
+  orange: "rgb(240, 228, 66)",
+  green: "rgb(8, 221, 163)",
   blue: "#61afef",
   purple: "#b940dd",
 }
