@@ -16,7 +16,11 @@ defmodule Streamr.S3Service do
   end
 
   defp resource_path_for(model, filepath) do
-    "#{table_name(model)}/#{model.id}/#{hashed_contents(filepath)}"
+    "#{table_name(model)}/#{model.id}/#{hashed_contents(filepath)}#{file_type(filepath)}"
+  end
+
+  defp file_type(filepath) do
+    Path.extname(filepath)
   end
 
   defp hashed_contents(filepath) do
