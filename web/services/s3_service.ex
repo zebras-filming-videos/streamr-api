@@ -9,18 +9,18 @@ defmodule Streamr.S3Service do
 
     local_path
     |> Upload.stream_file
-    |> S3.upload(@bucket_name, resource_path)
+    |> S3.upload(@bucket_name, resource_path, content_type: mime_type(local_path))
     |> ExAws.request!
 
     resource_path
   end
 
   defp resource_path_for(model, filepath) do
-    "#{table_name(model)}/#{model.id}/#{hashed_contents(filepath)}#{file_type(filepath)}"
+    "#{table_name(model)}/#{model.id}/#{hashed_contents(filepath)}"
   end
 
-  defp file_type(filepath) do
-    Path.extname(filepath)
+  defp mime_type(filepath) do
+    MIME.from_path(filepath)
   end
 
   defp hashed_contents(filepath) do
