@@ -81,7 +81,6 @@ defmodule Streamr.SVGGenerator do
     "and (line->>'time')::int > #{clear_event_time}"
   end
 
-
   defp svg_header do
     """
       <svg viewBox="0 0 1920 1080"><g fill="none">
