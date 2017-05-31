@@ -1,48 +1,56 @@
 defmodule Streamr.SVGGenerator do
   import Ecto.Query
+  import IEx
 
   alias Streamr.{Repo, Color}
   alias Ecto.Adapters.SQL
 
   def generate(stream) do
-    filepath = filepath_for(stream)
+    filepaths = filepaths_for(stream)
     undo_table_name = undo_table_name_for(stream)
 
     create_undos_table(stream, undo_table_name)
-    create_file(filepath)
-    create_svg(stream, filepath, undo_table_name)
+    create_files(filepaths)
+    draw_svg_paths(stream, filepaths, undo_table_name)
     drop_undos_table(undo_table_name)
-    add_footer(filepath)
-    convert_to_png(filepath)
+    add_footer(filepaths)
+    convert_to_png(filepaths)
   end
 
-  defp convert_to_png(filepath) do
-    new_filepath = String.replace_trailing(filepath, ".svg", ".png")
+  defp convert_to_png(filepaths) do
+    Enum.reduce filepaths, %{}, fn {palette, filepath}, map ->
+      new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
-    System.cmd("convert", [
-      filepath,
-      "-size", "1920x1080",
-      "-colorspace", "RGB",
-      new_filepath
-    ])
+      System.cmd("convert", [
+        filepath,
+        "-size", "1920x1080",
+        "-colorspace", "RGB",
+        new_filepath
+      ])
 
-    new_filepath
+      Map.put(map, palette, new_filepath)
+    end
   end
 
-  defp create_file(filepath) do
-    File.touch(filepath)
-    File.write!(filepath, svg_header())
+  defp create_files(filepaths) do
+    Enum.each Map.values(filepaths), fn filepath ->
+      File.touch(filepath)
+      File.write!(filepath, svg_header())
+    end
   end
 
-  defp create_svg(stream, filepath, undo_table_name) do
+  defp draw_svg_paths(stream, filepaths, undo_table_name) do
     color_map = generate_color_map()
     last_clear_event_time = determine_last_clear_time(stream)
 
-    Repo
+    svg_paths = Repo
     |> SQL.query!(stream_data_query(stream, undo_table_name, last_clear_event_time))
     |> Map.get(:rows)
     |> Parallel.pmap(pg_result_to_io(color_map))
-    |> Enum.into(File.stream!(filepath, [:append]))
+
+    Parallel.peach(filepaths, fn {palette, filepath} ->
+      Enum.into(svg_paths, File.stream!(filepath, [:append]), fn (row) -> row[palette] end)
+    end)
   end
 
   defp pg_result_to_io(color_map) do
@@ -50,7 +58,7 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp generate_svg_path(row, color_map) do
-    color = Map.get(color_map, String.to_integer(row["color_id"]))
+    # color = Map.get(color_map, String.to_integer(row["color_id"]))
     width = Map.get(row, "thickness") + 2
     suffix = line_cap(row)
 
@@ -59,7 +67,11 @@ defmodule Streamr.SVGGenerator do
     |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
     |> Enum.join("L")
 
-    ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)
+    Map.new [:normal, :deuteranopia, :tritanopia, :protanopia], fn palette ->
+      color = color_map[String.to_integer(row["color_id"])][palette]
+
+      {palette, ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)}
+    end
   end
 
   def stream_data_query(stream, undo_table_name, latest_clear_event) do
@@ -92,17 +104,32 @@ defmodule Streamr.SVGGenerator do
     "</g></svg>"
   end
 
-  defp add_footer(filepath) do
-    File.write!(filepath, svg_footer(), [:append])
+  defp add_footer(filepaths) do
+    Enum.each Map.values(filepaths), fn filepath ->
+      File.write!(filepath, svg_footer(), [:append])
+    end
   end
 
-  defp filepath_for(stream) do
-    "uploads/stream_preview_#{stream.id}.svg"
+  defp filepaths_for(stream) do
+    color_palettes = [:normal, :deuteranopia, :tritanopia, :protanopia]
+
+    color_palettes
+    |> Enum.zip(Enum.map(color_palettes, fn (p) -> "uploads/stream_preview_#{stream.id}_" <> Atom.to_string(p) <> ".svg" end))
+    |> Map.new()
   end
 
-  defp generate_color_map do
-    Repo.all(from c in Color, select: {c.id, c.normal})
-    |> Enum.into(%{})
+  def generate_color_map do
+    Map.new Repo.all(Color), fn color ->
+      {
+        color.id,
+        %{
+          normal: color.normal,
+          deuteranopia: color.deuteranopia,
+          protanopia: color.protanopia,
+          tritanopia: color.tritanopia
+        }
+      }
+    end
   end
 
   defp undo_table_name_for(stream) do
