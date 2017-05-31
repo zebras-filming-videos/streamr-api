@@ -1,6 +1,4 @@
 defmodule Streamr.SVGGenerator do
-  import Ecto.Query
-
   alias Streamr.{Repo, Color}
   alias Ecto.Adapters.SQL
 
@@ -37,7 +35,7 @@ defmodule Streamr.SVGGenerator do
 
   defp draw_svg_paths(stream, filepaths) do
     stream
-    |> generate_svg_paths(filepaths)
+    |> generate_svg_paths()
     |> write_to_svgs(filepaths)
   end
 
@@ -47,7 +45,7 @@ defmodule Streamr.SVGGenerator do
     end
   end
 
-  defp generate_svg_paths(stream, filepaths) do
+  defp generate_svg_paths(stream) do
     color_map = generate_color_map()
     last_clear_event_time = determine_last_clear_time(stream)
 
