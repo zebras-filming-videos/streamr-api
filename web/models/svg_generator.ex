@@ -7,12 +7,9 @@ defmodule Streamr.SVGGenerator do
 
   def generate(stream) do
     filepaths = filepaths_for(stream)
-    undo_table_name = undo_table_name_for(stream)
 
-    create_undos_table(stream, undo_table_name)
     create_files(filepaths)
-    draw_svg_paths(stream, filepaths, undo_table_name)
-    drop_undos_table(undo_table_name)
+    draw_svg_paths(stream, filepaths)
     add_footer(filepaths)
     convert_to_png(filepaths)
   end
@@ -39,9 +36,9 @@ defmodule Streamr.SVGGenerator do
     end
   end
 
-  defp draw_svg_paths(stream, filepaths, undo_table_name) do
+  defp draw_svg_paths(stream, filepaths) do
     stream
-    |> generate_svg_paths(filepaths, undo_table_name)
+    |> generate_svg_paths(filepaths)
     |> write_to_svgs(filepaths)
   end
 
@@ -51,12 +48,12 @@ defmodule Streamr.SVGGenerator do
     end
   end
 
-  defp generate_svg_paths(stream, filepaths, undo_table_name) do
+  defp generate_svg_paths(stream, filepaths) do
     color_map = generate_color_map()
     last_clear_event_time = determine_last_clear_time(stream)
 
     Repo
-    |> SQL.query!(stream_data_query(stream, undo_table_name, last_clear_event_time))
+    |> SQL.query!(stream_data_query(stream, last_clear_event_time))
     |> Map.get(:rows)
     |> Parallel.pmap(pg_result_to_io(color_map))
   end
@@ -85,15 +82,14 @@ defmodule Streamr.SVGGenerator do
     end
   end
 
-  defp stream_data_query(stream, undo_table_name, latest_clear_event) do
+  defp stream_data_query(stream, latest_clear_event) do
     """
       select line
       from stream_data
       left join lateral unnest(lines) as line on true
-      left join #{undo_table_name} on #{undo_table_name}.undo->>'line_id' = line->>'line_id'
       where stream_id = #{stream.id}
         and line->>'type' = 'line'
-        and #{undo_table_name}.undo is null
+        and line->>'line_id' not in (#{undo_events(stream)})
         #{limit_by_clear_event(latest_clear_event)}
       order by (line->>'time')::int asc
     """
@@ -147,25 +143,13 @@ defmodule Streamr.SVGGenerator do
     end
   end
 
-  defp undo_table_name_for(stream) do
-    "svg_generation_data_#{stream.id}"
-  end
-
-  defp create_undos_table(stream, table_name) do
-    SQL.query!(
-      Repo,
-      """
-       create table if not exists #{table_name} as
-       select line as undo from stream_data
-       left join lateral unnest(lines) as line on true
-       where stream_id = #{stream.id}
-         and line->>'type' = 'undo'
-      """
-    )
-  end
-
-  defp drop_undos_table(undo_table_name) do
-    SQL.query(Repo, "drop table #{undo_table_name}")
+  defp undo_events(stream) do
+    """
+      select line->>'line_id' from stream_data
+      left join lateral unnest(lines) as line on true
+      where stream_id = #{stream.id}
+        and line->>'type' = 'undo'
+    """
   end
 
   defp line_cap(row) do
