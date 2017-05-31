@@ -1,6 +1,5 @@
 defmodule Streamr.SVGGenerator do
   import Ecto.Query
-  import IEx
 
   alias Streamr.{Repo, Color}
   alias Ecto.Adapters.SQL

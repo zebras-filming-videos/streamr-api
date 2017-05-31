@@ -2,7 +2,6 @@ defmodule Streamr.StreamView do
   use Streamr.Web, :view
   use JaSerializer.PhoenixView
   use Streamr.Sluggifier, attribute: :title
-  import IEx
 
   alias Streamr.{UserView, TopicView, UrlQualifier, UserVoteView, StreamImageSelector}
 
