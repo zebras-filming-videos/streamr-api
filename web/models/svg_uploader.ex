@@ -12,4 +12,12 @@ defmodule Streamr.SVGUploader do
       Map.put(map, palette, S3Service.upload_file(filepath, stream))
     end
   end
+
+  defp upload_files(filepaths_map, stream) do
+    s3_keys = Parallel.pmap filepaths_map, fn {_, filepath} ->
+      S3Service.upload_file(filepath, stream)
+    end
+
+    Enum.zip(Color.palettes, s3_keys)
+  end
 end

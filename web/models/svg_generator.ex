@@ -18,7 +18,7 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp convert_to_png(filepaths) do
-    Enum.reduce filepaths, %{}, fn {palette, filepath}, map ->
+    new_filepaths = Parallel.pmap filepaths, fn {palette, filepath} ->
       new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
       System.cmd("convert", [
@@ -28,8 +28,10 @@ defmodule Streamr.SVGGenerator do
         new_filepath
       ])
 
-      Map.put(map, palette, new_filepath)
+      new_filepath
     end
+
+    Enum.zip(Color.palettes, new_filepaths)
   end
 
   defp create_files(filepaths) do
@@ -40,17 +42,25 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp draw_svg_paths(stream, filepaths, undo_table_name) do
+    stream
+    |> generate_svg_paths(filepaths, undo_table_name)
+    |> write_to_svgs(filepaths)
+  end
+
+  defp write_to_svgs(svg_paths, filepaths) do
+    Parallel.peach filepaths, fn {palette, filepath} ->
+      Enum.into(svg_paths, File.stream!(filepath, [:append]), fn (row) -> row[palette] end)
+    end
+  end
+
+  defp generate_svg_paths(stream, filepaths, undo_table_name) do
     color_map = generate_color_map()
     last_clear_event_time = determine_last_clear_time(stream)
 
-    svg_paths = Repo
+    Repo
     |> SQL.query!(stream_data_query(stream, undo_table_name, last_clear_event_time))
     |> Map.get(:rows)
     |> Parallel.pmap(pg_result_to_io(color_map))
-
-    Parallel.peach(filepaths, fn {palette, filepath} ->
-      Enum.into(svg_paths, File.stream!(filepath, [:append]), fn (row) -> row[palette] end)
-    end)
   end
 
   defp pg_result_to_io(color_map) do
@@ -58,23 +68,26 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp generate_svg_path(row, color_map) do
-    # color = Map.get(color_map, String.to_integer(row["color_id"]))
     width = Map.get(row, "thickness") + 2
     suffix = line_cap(row)
+    color_id = String.to_integer(row["color_id"])
 
-    path = row
+    row
     |> Map.get("points")
     |> Enum.map(fn point -> "#{point["x"] * 1920},#{point["y"] * 1080}" end)
     |> Enum.join("L")
+    |> generate_possible_paths(color_id, color_map, width, suffix)
+  end
 
-    Map.new [:normal, :deuteranopia, :tritanopia, :protanopia], fn palette ->
-      color = color_map[String.to_integer(row["color_id"])][palette]
+  defp generate_possible_paths(path, color_id, color_map, width, suffix) do
+    Map.new Color.palettes, fn palette ->
+      color = color_map[color_id][palette]
 
       {palette, ~s(<path stroke="#{color}" stroke-width="#{width}" d="M#{path}#{suffix}"></path>)}
     end
   end
 
-  def stream_data_query(stream, undo_table_name, latest_clear_event) do
+  defp stream_data_query(stream, undo_table_name, latest_clear_event) do
     """
       select line
       from stream_data
@@ -111,15 +124,19 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp filepaths_for(stream) do
-    color_palettes = [:normal, :deuteranopia, :tritanopia, :protanopia]
-
-    color_palettes
-    |> Enum.zip(Enum.map(color_palettes, fn (p) -> "uploads/stream_preview_#{stream.id}_" <> Atom.to_string(p) <> ".svg" end))
+    Color.palettes
+    |> Enum.zip(unique_filenames(stream))
     |> Map.new()
   end
 
+  defp unique_filenames(stream) do
+    Enum.map Color.palettes, fn (palette) ->
+      "uploads/stream_preview_#{stream.id}_" <> Atom.to_string(palette) <> ".svg"
+    end
+  end
+
   def generate_color_map do
-    Map.new Repo.all(Color), fn color ->
+    Map.new Repo.all(Color), fn (color) ->
       {
         color.id,
         %{
