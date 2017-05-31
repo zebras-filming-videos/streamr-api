@@ -1,5 +1,5 @@
 defmodule Streamr.SVGUploader do
-  alias Streamr.{SVGGenerator, S3Service}
+  alias Streamr.{SVGGenerator, S3Service, Color}
 
   def upload(stream) do
     stream
@@ -14,10 +14,8 @@ defmodule Streamr.SVGUploader do
   end
 
   defp upload_files(filepaths_map, stream) do
-    s3_keys = Parallel.pmap filepaths_map, fn {_, filepath} ->
+    Parallel.pupdate filepaths_map, fn filepath ->
       S3Service.upload_file(filepath, stream)
     end
-
-    Enum.zip(Color.palettes, s3_keys)
   end
 end

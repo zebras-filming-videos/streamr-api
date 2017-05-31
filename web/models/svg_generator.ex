@@ -18,7 +18,7 @@ defmodule Streamr.SVGGenerator do
   end
 
   defp convert_to_png(filepaths) do
-    new_filepaths = Parallel.pmap filepaths, fn {palette, filepath} ->
+    Parallel.pupdate filepaths, fn filepath ->
       new_filepath = String.replace_trailing(filepath, ".svg", ".png")
 
       System.cmd("convert", [
@@ -30,8 +30,6 @@ defmodule Streamr.SVGGenerator do
 
       new_filepath
     end
-
-    Enum.zip(Color.palettes, new_filepaths)
   end
 
   defp create_files(filepaths) do
